@@ -1,116 +1,89 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
-    <q-header elevated>
+  <q-layout view="hHh lpR fFf">
+    <!-- Header with Hamburger Menu for Desktop -->
+    <q-header elevated class="bg-primary text-white desktop-only">
       <q-toolbar>
-        <q-btn
-          flat
-          dense
-          round
-          icon="menu"
-          aria-label="Menu"
-          @click="toggleLeftDrawer"
-        />
-
-        <q-toolbar-title>
-          Quasar App
-        </q-toolbar-title>
-
-        <div>Quasar v{{ $q.version }}</div>
+        <q-btn dense flat round icon="menu" @click="toggleLeftDrawer" />
+        <!-- Other header content -->
       </q-toolbar>
     </q-header>
 
-    <q-drawer
-      v-model="leftDrawerOpen"
-      show-if-above
-      bordered
-    >
-      <q-list>
-        <q-item-label
-          header
-        >
-          Essential Links
-        </q-item-label>
-
-        <EssentialLink
-          v-for="link in essentialLinks"
-          :key="link.title"
-          v-bind="link"
+    <!-- Left Drawer for Desktop -->
+    <q-drawer v-model="leftDrawerOpen" side="left" class="desktop-only">
+      <q-tabs vertical>
+        <!-- Navigation tabs -->
+        <q-route-tab
+          name="Asset"
+          icon="diamond"
+          to="/feature/asset"
+          label="Asset"
         />
-      </q-list>
+        <q-route-tab
+          name="Gameplay"
+          icon="sports_esports"
+          to="/feature/gameplay"
+          label="Gameplay"
+        />
+        <q-route-tab
+          name="Crafting"
+          icon="join_full"
+          to="/feature/crafting"
+          label="Crafting"
+        />
+        <q-route-tab
+          name="Assure"
+          icon="gpp_good"
+          to="/feature/assure"
+          label="Assure"
+        />
+        <q-route-tab
+          name="Settings"
+          icon="settings"
+          to="/feature//settings"
+          label="Settings"
+        />
+      </q-tabs>
     </q-drawer>
 
+    <!-- Page Container -->
     <q-page-container>
-      <router-view />
+      <router-view></router-view>
     </q-page-container>
+
+    <!-- Bottom Tabs Navigation for Mobile -->
+    <q-footer reveal class="bg-primary mobile-only">
+      <q-tabs class="text-white">
+        <!-- Navigation tabs -->
+        <q-route-tab name="Asset" to="/feature/asset" icon="diamond" />
+        <q-route-tab
+          name="Gameplay"
+          to="/feature/gameplay"
+          icon="sports_esports"
+        />
+        <q-route-tab name="Crafting" to="/feature/crafting" icon="join_full" />
+        <q-route-tab name="Assure" to="/feature/assure" icon="gpp_good" />
+        <q-route-tab name="Settings" to="/feature/settings" icon="settings" />
+      </q-tabs>
+    </q-footer>
   </q-layout>
 </template>
 
-<script lang="ts">
+<script>
 import { defineComponent, ref } from 'vue';
-import EssentialLink from 'components/EssentialLink.vue';
-
-const linksList = [
-  {
-    title: 'Docs',
-    caption: 'quasar.dev',
-    icon: 'school',
-    link: 'https://quasar.dev'
-  },
-  {
-    title: 'Github',
-    caption: 'github.com/quasarframework',
-    icon: 'code',
-    link: 'https://github.com/quasarframework'
-  },
-  {
-    title: 'Discord Chat Channel',
-    caption: 'chat.quasar.dev',
-    icon: 'chat',
-    link: 'https://chat.quasar.dev'
-  },
-  {
-    title: 'Forum',
-    caption: 'forum.quasar.dev',
-    icon: 'record_voice_over',
-    link: 'https://forum.quasar.dev'
-  },
-  {
-    title: 'Twitter',
-    caption: '@quasarframework',
-    icon: 'rss_feed',
-    link: 'https://twitter.quasar.dev'
-  },
-  {
-    title: 'Facebook',
-    caption: '@QuasarFramework',
-    icon: 'public',
-    link: 'https://facebook.quasar.dev'
-  },
-  {
-    title: 'Quasar Awesome',
-    caption: 'Community Quasar projects',
-    icon: 'favorite',
-    link: 'https://awesome.quasar.dev'
-  }
-];
 
 export default defineComponent({
   name: 'MainLayout',
+  setup() {
+    const leftDrawerOpen = ref(false);
 
-  components: {
-    EssentialLink
-  },
-
-  setup () {
-    const leftDrawerOpen = ref(false)
+    const toggleLeftDrawer = () => {
+      leftDrawerOpen.value = !leftDrawerOpen.value;
+    };
 
     return {
-      essentialLinks: linksList,
       leftDrawerOpen,
-      toggleLeftDrawer () {
-        leftDrawerOpen.value = !leftDrawerOpen.value
-      }
-    }
-  }
+      toggleLeftDrawer,
+    };
+  },
 });
 </script>
