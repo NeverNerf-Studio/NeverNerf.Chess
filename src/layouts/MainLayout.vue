@@ -1,13 +1,5 @@
 <template>
   <q-layout view="hHh lpR fFf">
-    <!-- Header with Hamburger Menu for Desktop -->
-    <q-header elevated class="bg-primary text-white desktop-only">
-      <q-toolbar>
-        <q-btn dense flat round icon="menu" @click="toggleLeftDrawer" />
-        <!-- Other header content -->
-      </q-toolbar>
-    </q-header>
-
     <!-- Page Container -->
     <q-page-container>
       <router-view></router-view>
@@ -30,18 +22,13 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import routes from '../router/routes';
 
 const route = useRoute();
 const token_id = route.params.token_id;
-const leftDrawerOpen = ref(false);
 const isAuthenticated = localStorage.getItem('authToken');
-
-function toggleLeftDrawer() {
-  leftDrawerOpen.value = !leftDrawerOpen.value;
-}
 
 const accessibleRoutes = computed(() => {
   // Find the menu routes
