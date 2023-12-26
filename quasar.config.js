@@ -70,7 +70,21 @@ module.exports = configure(function (/* ctx */) {
       // polyfillModulePreload: true,
       // distDir
 
-      // extendViteConf (viteConf) {},
+      extendViteConf(viteConf) {
+        // Check if optimizeDeps.esbuildOptions exists, if not, initialize it
+        if (!viteConf.optimizeDeps) {
+          viteConf.optimizeDeps = {};
+        }
+        if (!viteConf.optimizeDeps.esbuildOptions) {
+          viteConf.optimizeDeps.esbuildOptions = {};
+        }
+
+        // Set the global definition
+        viteConf.optimizeDeps.esbuildOptions.define = {
+          global: 'globalThis',
+        };
+      },
+
       // viteVuePluginOptions: {},
 
       vitePlugins: [
@@ -99,9 +113,7 @@ module.exports = configure(function (/* ctx */) {
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#framework
     framework: {
-      config: {
-        dark: true,
-      },
+      config: {},
 
       // iconSet: 'material-icons', // Quasar icon set
       // lang: 'en-US', // Quasar language pack

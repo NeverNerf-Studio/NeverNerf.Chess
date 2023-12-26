@@ -39,7 +39,7 @@ const accessibleRoutes = computed(() => {
     // Filter the child routes based on 'meta.requiresAuth'
     if (!isAuthenticated) {
       return menuRoutes.filter(
-        (childRoute) => childRoute.meta && childRoute.meta.requiresAuth
+        (childRoute) => childRoute.meta && !childRoute.meta.requiresAuth
       );
     } else {
       return menuRoutes;

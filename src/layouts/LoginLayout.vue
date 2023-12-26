@@ -82,6 +82,7 @@
 import { useRouter, useRoute } from 'vue-router';
 import { watch, onMounted } from 'vue';
 import { useMetadataStore } from 'src/stores/asset-store.ts';
+import { config, passport } from '@imtbl/sdk';
 
 const router = useRouter();
 const route = useRoute();
@@ -98,14 +99,29 @@ watch(
 
 const isAuthenticated = localStorage.getItem('authToken');
 
-function login() {
-  localStorage.setItem('authToken', 'foo');
+const passportInstance = new passport.Passport({
+  baseConfig: {
+    environment: config.Environment.PRODUCTION,
+    publishableKey: 'neverNerf',
+  },
+  clientId: 'gYbNCjXOPjhiYp3n0n7RQLMYq8tC3zAL',
+  redirectUri: 'https://localhost:9000/redirect',
+  logoutRedirectUri: 'https://localhost:3000/logout',
+  audience: 'platform_api',
+  scope: 'openid offline_access email transact',
+});
+
+async function login() {
+  try {
+    await passportInstance.login(); // This method opens the Passport window
+  } catch (error) {
+    console.error('Login failed:', error);
+  }
 
   if (token_id && isAuthenticated) {
     router.push({ path: `/${token_id}/asset` });
   } else {
     console.error('Route or route parameters are undefined');
-    //handle token listing UI
   }
 }
 </script>

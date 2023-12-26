@@ -1,9 +1,10 @@
 .DS_Store
 .thumbs.db
 node_modules
+.vscode
 
 # Lock files
-yarn.Lock
+./yarn.lock
 package-lock.json
 
 # Quasar core related directories
@@ -39,3 +40,4 @@ yarn-error.log*
 
 # local .env files
 .env.local*
+yarn.lock
