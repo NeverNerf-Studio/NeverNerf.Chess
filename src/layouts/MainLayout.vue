@@ -8,27 +8,13 @@
       </q-toolbar>
     </q-header>
 
-    <!-- Left Drawer for Desktop -->
-    <q-drawer v-model="leftDrawerOpen" side="left" class="desktop-only">
-      <q-tabs vertical>
-        <q-route-tab
-          v-for="route in accessibleRoutes"
-          :key="route.name"
-          :name="route.name"
-          :icon="route.icon"
-          :to="`/${token_id}/${route.path}`"
-          :label="route.name"
-        />
-      </q-tabs>
-    </q-drawer>
-
     <!-- Page Container -->
     <q-page-container>
       <router-view></router-view>
     </q-page-container>
 
     <!-- Bottom Tabs Navigation for Mobile -->
-    <q-footer reveal class="bg-primary mobile-only">
+    <q-footer reveal class="bg-primary">
       <q-tabs class="text-white">
         <!-- Navigation tabs -->
         <q-route-tab
