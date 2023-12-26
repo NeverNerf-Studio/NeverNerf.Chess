@@ -9,34 +9,45 @@ import SettingsFeature from 'pages/features/SettingsFeature.vue';
 
 export default [
   {
-    path: '/',
+    path: '/:token_id',
     component: LoginLayout,
   },
   {
-    path: '/feature',
+    path: '/:token_id',
     component: MainLayout,
     children: [
       {
         path: 'asset',
+        name: 'Asset',
+        icon: 'diamond',
+        meta: { requiresAuth: false },
         component: AssetFeature,
       },
       {
         path: 'gameplay',
+        name: 'Gameplay',
+        icon: 'sports_esports',
         meta: { requiresAuth: true },
         component: GameplayFeature,
       },
       {
         path: 'crafting',
+        name: 'Crafting',
+        icon: 'join_full',
         meta: { requiresAuth: true },
         component: CraftingFeature,
       },
       {
         path: 'assure',
+        name: 'Assure',
+        icon: 'gpp_good',
         meta: { requiresAuth: true },
         component: AssureFeature,
       },
       {
         path: 'settings',
+        name: 'Settings',
+        icon: 'settings',
         meta: { requiresAuth: true },
         component: SettingsFeature,
       },

@@ -34,15 +34,14 @@ export default route(function (/* { store, ssrContext } */) {
     history: createHistory(process.env.VUE_ROUTER_BASE),
   });
 
+  const isAuthenticated = localStorage.getItem('authToken');
   Router.beforeEach((to, from, next) => {
-    // Example authentication check
-    const isAuthenticated = false; // Replace with actual authentication check
-
+    const token_id = to.params.token_id;
     if (
       to.matched.some((record) => record.meta.requiresAuth) &&
       !isAuthenticated
     ) {
-      next('/'); // Redirect to login page
+      next(`/${token_id}`); // Redirect to login page
     } else {
       next(); // Proceed as normal
     }
