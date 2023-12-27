@@ -13,26 +13,17 @@
         </q-toolbar>
       </q-header>
       <q-page-container>
-        <div style="min-width: 360px" v-if="asset.imx">
+        <div v-if="asset.imx">
           <!-- Asset hero image -->
           <!-- <img src="/imx_metadata/176708/Thumbnail_Hero_Tikor_Base.png" /> -->
-          <q-img
-            :src="asset.imx.metadata.image_url"
-            style="
-              max-width: 100vw;
-              max-height: 90vh;
-              min-height: 90vh;
-              width: 100%;
-              height: 100%;
-            "
-          >
-            <div class="absolute-bottom text-center q-gutter-y-sm">
+          <q-img :src="asset.imx.metadata.image_url" class="fixed-full">
+            <div class="absolute-bottom text-center">
               <span class="text-h5">
                 {{ asset.imx.metadata.name }}: {{ asset.imx.metadata.tagline }}
               </span>
 
               <!-- Passport Login -->
-              <div>
+              <div style="padding-top: 10px">
                 <q-btn
                   push
                   no-caps
@@ -57,7 +48,7 @@
               </div>
 
               <!-- Guest Access -->
-              <div>
+              <div style="padding-bottom: 20px">
                 <q-btn flat no-caps :to="`/${token_id}/asset`">
                   <div class="text-center"><u>View as Guest</u></div>
                 </q-btn>
