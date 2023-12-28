@@ -70,24 +70,13 @@
 </template>
 
 <script setup>
-import { useRouter, useRoute } from 'vue-router';
-import { watch, onMounted } from 'vue';
-import { useMetadataStore } from 'src/stores/asset-store.ts';
+import { computed } from 'vue';
+import { useRoute } from 'vue-router';
+import { useAssetStore } from 'src/stores/asset-store';
 import { config, passport } from '@imtbl/sdk';
 
-const router = useRouter();
-const route = useRoute();
-
-const token_id = route.params.token_id;
-const asset = useMetadataStore();
-
-// Load metadata when component is mounted or token_id changes
-onMounted(() => asset.loadMetadata(token_id));
-watch(
-  () => token_id,
-  () => asset.loadMetadata(token_id)
-);
-
+const token_id = computed(() => useRoute().params.token_id);
+const asset = computed(() => useAssetStore());
 const isAuthenticated = localStorage.getItem('authToken');
 
 const passportInstance = new passport.Passport({
@@ -109,8 +98,8 @@ async function login() {
     console.error('Login failed:', error);
   }
 
-  if (token_id && isAuthenticated) {
-    router.push({ path: `/${token_id}/asset` });
+  if (token_id.value && isAuthenticated) {
+    router.push({ path: `/${token_id.value}/asset` });
   } else {
     console.error('Route or route parameters are undefined');
   }

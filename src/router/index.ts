@@ -5,6 +5,7 @@ import {
   createWebHashHistory,
   createWebHistory,
 } from 'vue-router';
+import { useAssetStore } from 'src/stores/asset-store';
 
 import routes from './routes';
 
@@ -35,8 +36,15 @@ export default route(function (/* { store, ssrContext } */) {
   });
 
   const isAuthenticated = localStorage.getItem('authToken');
+
   Router.beforeEach((to, from, next) => {
-    const token_id = to.params.token_id;
+    const token_id = to.params.token_id as string;
+    const asset = useAssetStore();
+
+    if (token_id && (!asset.imx || asset.imx.token_id !== token_id)) {
+      asset.loadMetadata(token_id);
+    }
+
     if (
       to.matched.some((record) => record.meta.requiresAuth) &&
       !isAuthenticated
