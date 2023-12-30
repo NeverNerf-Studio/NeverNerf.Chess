@@ -10,8 +10,8 @@ export class ImmutableService {
         publishableKey: 'NNdev',
       },
       clientId: 'gYbNCjXOPjhiYp3n0n7RQLMYq8tC3zAL',
-      redirectUri: 'http://localhost:9000/#/callback',
-      logoutRedirectUri: 'http://localhost:9000/#/logout',
+      redirectUri: `${window.location.protocol}//${window.location.host}/#/callback`,
+      logoutRedirectUri: `${window.location.protocol}//${window.location.host}/#//logout`,
       audience: 'platform_api',
       scope: 'openid offline_access email transact',
     });
