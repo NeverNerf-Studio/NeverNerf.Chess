@@ -15,7 +15,6 @@
       <q-page-container>
         <div v-if="asset.imx">
           <!-- Asset hero image -->
-          <!-- <img src="/imx_metadata/176708/Thumbnail_Hero_Tikor_Base.png" /> -->
           <q-img :src="asset.imx.metadata.image_url" class="fixed-full">
             <div class="absolute-bottom text-center">
               <span class="text-h5">
@@ -30,16 +29,13 @@
                   rounded
                   color="grey-1"
                   @click="login"
-                  style="width: 240px"
-                >
+                  style="width: 240px">
                   <div
-                    class="full-width row no-wrap justify-between items-center content-start"
-                  >
+                    class="full-width row no-wrap justify-between items-center content-start">
                     <q-img
                       left
                       src="/passport_logo_64px.svg"
-                      style="max-width: 50px"
-                    />
+                      style="max-width: 50px" />
                     <div class="text-center text-dark">
                       Sign in with Immutable
                     </div>
@@ -69,39 +65,49 @@
   </div>
 </template>
 
-<script setup>
-import { computed } from 'vue';
-import { useRoute } from 'vue-router';
+<script>
+import { usePassportStore } from '/src/stores/passport-store';
+import { onMounted, computed } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import { useAssetStore } from 'src/stores/asset-store';
-import { config, passport } from '@imtbl/sdk';
 
-const token_id = computed(() => useRoute().params.token_id);
-const asset = computed(() => useAssetStore());
-const isAuthenticated = localStorage.getItem('authToken');
+export default {
+  setup() {
+    const passport = usePassportStore();
+    const token_id = computed(() => useRoute().params.token_id);
+    const assetStore = useAssetStore();
+    const router = useRouter();
 
-const passportInstance = new passport.Passport({
-  baseConfig: {
-    environment: config.Environment.PRODUCTION,
-    publishableKey: 'neverNerf',
+    onMounted(() => {
+      checkAuthentication();
+      assetStore.loadMetadata(token_id.value);
+    });
+
+    function login() {
+      passport.login();
+    }
+    function logout() {
+      passport.logout();
+    }
+
+    async function checkAuthentication() {
+      try {
+        const userInfo = await passport.getUserInfo();
+        if (userInfo) {
+          router.push(`/${token_id.value}/asset`);
+        }
+      } catch (error) {
+        console.error('Error checking authentication:', error);
+      }
+    }
+
+    return {
+      token_id,
+      asset: computed(() => assetStore),
+      login,
+      logout,
+      buttonState: passport.buttonState,
+    };
   },
-  clientId: 'gYbNCjXOPjhiYp3n0n7RQLMYq8tC3zAL',
-  redirectUri: 'https://localhost:9000/redirect',
-  logoutRedirectUri: 'https://localhost:3000/logout',
-  audience: 'platform_api',
-  scope: 'openid offline_access email transact',
-});
-
-async function login() {
-  try {
-    await passportInstance.login(); // This method opens the Passport window
-  } catch (error) {
-    console.error('Login failed:', error);
-  }
-
-  if (token_id.value && isAuthenticated) {
-    router.push({ path: `/${token_id.value}/asset` });
-  } else {
-    console.error('Route or route parameters are undefined');
-  }
-}
+};
 </script>

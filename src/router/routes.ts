@@ -1,5 +1,6 @@
 import LoginLayout from 'layouts/LoginLayout.vue';
 import MainLayout from 'layouts/MainLayout.vue';
+import CallbackLayout from 'layouts/CallbackLayout.vue';
 import ErrorNotFound from 'pages/ErrorNotFound.vue';
 import AssetFeature from 'pages/features/AssetFeature.vue';
 import GameplayFeature from 'pages/features/GameplayFeature.vue';
@@ -8,6 +9,10 @@ import AssureFeature from 'pages/features/AssureFeature.vue';
 import SettingsFeature from 'pages/features/SettingsFeature.vue';
 
 export default [
+  {
+    path: '/callback',
+    component: CallbackLayout,
+  },
   {
     path: '/:token_id',
     component: LoginLayout,
