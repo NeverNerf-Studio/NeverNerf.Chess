@@ -1,6 +1,16 @@
 <template>
-  <div class="column content-center" v-if="isAuthenticated">
-    <div>
+  <div class="q-my-md text-center">
+    <h5>Settings</h5>
+    <div class="q-gutter-y-md">
+      <q-btn push no-caps rounded disable color="blue" style="width: 240px"
+        >Buy</q-btn
+      >
+      <q-btn push no-caps rounded disable color="blue" style="width: 240px"
+        >Sell</q-btn
+      >
+      <q-btn push no-caps rounded disable color="blue" style="width: 240px"
+        >Burn</q-btn
+      >
       <q-btn
         push
         no-caps
@@ -15,17 +25,10 @@
 </template>
 
 <script setup>
-import { useRouter, useRoute } from 'vue-router';
 import { usePassportStore } from '/src/stores/passport-store';
 const passport = usePassportStore();
-const isAuthenticated = passport.getUserInfo();
-
-const router = useRouter();
-const route = useRoute();
-const token_id = route.params.token_id;
 
 function logout() {
   passport.logout();
-  router.push({ path: `/${token_id}` });
 }
 </script>

@@ -2,11 +2,17 @@ import { defineStore } from 'pinia';
 import { immutableService } from 'src/immutable';
 import { provider } from '@imtbl/sdk';
 
+type UserProfile = {
+  email?: string;
+  nickname?: string;
+  sub: string;
+};
+
 export const usePassportStore = defineStore('passport', {
   state: () => ({
     provider: null as provider.IMXProvider | null,
     buttonState: 'Connect Passport',
-    userProfile: null,
+    userProfile: null as UserProfile | undefined | null,
   }),
   actions: {
     async login() {
@@ -24,6 +30,7 @@ export const usePassportStore = defineStore('passport', {
     async logout() {
       await immutableService.logout();
       this.provider = null;
+      this.userProfile = null;
       this.buttonState = 'Connect Passport';
     },
     async handleLoginCallback() {
@@ -31,8 +38,12 @@ export const usePassportStore = defineStore('passport', {
     },
     async getUserInfo() {
       try {
-        const userInfo = await immutableService.getUserInfo();
-        return userInfo;
+        if (!this.userProfile) {
+          this.userProfile = await immutableService.getUserInfo();
+          return this.userProfile;
+        } else {
+          return this.userProfile;
+        }
       } catch (error) {
         console.error('Error fetching user info:', error);
         return null;

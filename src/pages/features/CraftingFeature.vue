@@ -1,5 +1,6 @@
 <template>
-  <div>
-    <h2>Crafting</h2>
+  <div class="q-my-md text-center">
+    <h5>Crafting</h5>
+    <h5>(Coming Soon)</h5>
   </div>
 </template>

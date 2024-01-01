@@ -18,8 +18,13 @@ export default [
     component: LoginLayout,
   },
   {
+    path: '/logout',
+    component: LoginLayout,
+  },
+  {
     path: '/:token_id',
     component: MainLayout,
+    name: 'menuRoot',
     children: [
       {
         path: 'asset',

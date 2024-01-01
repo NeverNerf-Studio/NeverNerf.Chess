@@ -23,12 +23,20 @@ export default function (/* { store, ssrContext } */) {
   Router.beforeEach(async (to, from, next) => {
     const passport = usePassportStore(); // Use the Passport store
     const isAuthenticated = await passport.getUserInfo(); // Check if the user is authenticated
+    const token_id = to.params.token_id;
 
+    if (to.path == '/logout') next(`/${from.params.token_id}/asset`);
+
+    //Enforce route requiresAuth
     if (
       to.matched.some((record) => record.meta.requiresAuth) &&
       !isAuthenticated
     ) {
-      next('/'); // Redirect to login page if not authenticated
+      if (token_id) {
+        next(`/${token_id}/asset`);
+      } else {
+        next('/');
+      } // Redirect to login page if not authenticated
     } else {
       next(); // Proceed as normal
     }

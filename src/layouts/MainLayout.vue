@@ -35,14 +35,12 @@ export default {
     const accessibleRoutes = ref([]);
 
     const updateAccessibleRoutes = () => {
-      const menuRoutes = routes[2].children;
-      if (menuRoutes) {
-        accessibleRoutes.value = passport.userProfile
-          ? menuRoutes
-          : menuRoutes.filter(
-              (childRoute) => childRoute.meta && !childRoute.meta.requiresAuth
-            );
-      }
+      const menuRoutes = routes.find((route) => route.name === 'menuRoot');
+      accessibleRoutes.value = passport.userProfile
+        ? menuRoutes.children
+        : menuRoutes.children.filter(
+            (childRoute) => childRoute.meta && !childRoute.meta.requiresAuth
+          );
     };
 
     onMounted(() => {
