@@ -1,24 +1,13 @@
-import { route } from 'quasar/wrappers';
 import {
-  createMemoryHistory,
   createRouter,
-  createWebHashHistory,
   createWebHistory,
+  createMemoryHistory,
+  createWebHashHistory,
 } from 'vue-router';
-import { useAssetStore } from 'src/stores/asset-store';
-
 import routes from './routes';
+import { usePassportStore } from 'src/stores/passport-store'; // Import Passport store
 
-/*
- * If not building with SSR mode, you can
- * directly export the Router instantiation;
- *
- * The function below can be async too; either use
- * async/await or return a Promise which resolves
- * with the Router instance.
- */
-
-export default route(function (/* { store, ssrContext } */) {
+export default function (/* { store, ssrContext } */) {
   const createHistory = process.env.SERVER
     ? createMemoryHistory
     : process.env.VUE_ROUTER_MODE === 'history'
@@ -26,34 +15,24 @@ export default route(function (/* { store, ssrContext } */) {
     : createWebHashHistory;
 
   const Router = createRouter({
-    scrollBehavior: () => ({ left: 0, top: 0 }),
-    routes,
-
-    // Leave this as is and make changes in quasar.conf.js instead!
-    // quasar.conf.js -> build -> vueRouterMode
-    // quasar.conf.js -> build -> publicPath
     history: createHistory(process.env.VUE_ROUTER_BASE),
+    routes,
+    scrollBehavior: () => ({ left: 0, top: 0 }),
   });
 
-  const isAuthenticated = localStorage.getItem('authToken');
-
-  Router.beforeEach((to, from, next) => {
-    const token_id = to.params.token_id as string;
-    const asset = useAssetStore();
-
-    if (token_id && (!asset.imx || asset.imx.token_id !== token_id)) {
-      asset.loadMetadata(token_id);
-    }
+  Router.beforeEach(async (to, from, next) => {
+    const passport = usePassportStore(); // Use the Passport store
+    const isAuthenticated = await passport.getUserInfo(); // Check if the user is authenticated
 
     if (
       to.matched.some((record) => record.meta.requiresAuth) &&
       !isAuthenticated
     ) {
-      next(`/${token_id}`); // Redirect to login page
+      next('/'); // Redirect to login page if not authenticated
     } else {
       next(); // Proceed as normal
     }
   });
 
   return Router;
-});
+}

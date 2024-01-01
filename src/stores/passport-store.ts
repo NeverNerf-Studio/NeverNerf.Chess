@@ -6,6 +6,7 @@ export const usePassportStore = defineStore('passport', {
   state: () => ({
     provider: null as provider.IMXProvider | null,
     buttonState: 'Connect Passport',
+    userProfile: null,
   }),
   actions: {
     async login() {

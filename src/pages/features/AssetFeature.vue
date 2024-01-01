@@ -1,10 +1,9 @@
 <template>
-  <div v-if="!asset.loading" class="q-pa-md">
+  <div v-if="asset?.imx?.metadata" class="q-pa-md">
     <q-img
       :src="asset.imx.metadata.animation_url"
       class="rounded-borders q-mx-auto row justify-between"
-      style="max-height: 50vh; max-width: 50vh"
-    />
+      style="max-height: 50vh; max-width: 50vh" />
 
     <div class="q-my-md text-center">
       <div class="text-h5 q-my-md">{{ asset.imx.metadata.name }}</div>
@@ -14,8 +13,7 @@
         <q-item
           v-for="(value, key) in filteredMetadata"
           :key="key"
-          class="row justify-between"
-        >
+          class="row justify-between">
           <q-item-section>{{ key }}:</q-item-section>
           <q-item-section>{{ value }}</q-item-section>
         </q-item>
@@ -36,8 +34,7 @@
                   icon="content_copy"
                   @click="copyToClipboard(nestedValue)"
                   flat
-                  dense
-                />
+                  dense />
               </q-item-section>
             </q-item>
           </div>
@@ -51,8 +48,7 @@
                 icon="content_copy"
                 @click="copyToClipboard(value)"
                 flat
-                dense
-              />
+                dense />
             </q-item-section>
           </q-item>
         </div>
@@ -63,11 +59,23 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { onMounted, computed } from 'vue';
 import { useAssetStore } from 'src/stores/asset-store';
-const asset = computed(() => useAssetStore());
+import { useRoute } from 'vue-router';
+
+const asset = computed(() => assetStore);
+const token_id = computed(() => useRoute().params.token_id);
+const assetStore = useAssetStore();
+onMounted(() => {
+  assetStore.loadMetadata(token_id.value);
+});
 
 const filteredMetadata = computed(() => {
+  // Check if asset is not loaded or is undefined/null
+  if (!asset.value || asset.value.loading) {
+    // Return an empty object or any other default value
+    return {};
+  }
   const keysToInclude = [
     'class',
     'series',

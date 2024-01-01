@@ -16,13 +16,16 @@
 
 <script setup>
 import { useRouter, useRoute } from 'vue-router';
-const isAuthenticated = localStorage.getItem('authToken');
+import { usePassportStore } from '/src/stores/passport-store';
+const passport = usePassportStore();
+const isAuthenticated = passport.getUserInfo();
+
 const router = useRouter();
 const route = useRoute();
 const token_id = route.params.token_id;
 
 function logout() {
-  localStorage.removeItem('authToken');
+  passport.logout();
   router.push({ path: `/${token_id}` });
 }
 </script>
