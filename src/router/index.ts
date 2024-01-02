@@ -23,20 +23,37 @@ export default function (/* { store, ssrContext } */) {
   Router.beforeEach(async (to, from, next) => {
     const passport = usePassportStore(); // Use the Passport store
     const isAuthenticated = await passport.getUserInfo(); // Check if the user is authenticated
+    const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
+    const publicAltRoute = to.meta.publicAltRoute;
     const token_id = to.params.token_id;
+
+    if (process.env.NODE_ENV == 'development') {
+      console.group('Router.beforeEach debug:');
+      console.log('route to: ');
+      console.log(to);
+      console.log('route from: ');
+      console.log(to);
+      console.log('passport: ');
+      console.log(passport);
+      console.log('isAuthenticated: ' + isAuthenticated);
+      console.log('requiresAuth: ' + requiresAuth);
+      console.log('publicAltRoute: ' + publicAltRoute);
+      console.log('token_id: ' + token_id);
+    }
 
     if (to.path == '/logout') next(`/${from.params.token_id}/asset`);
 
-    //Enforce route requiresAuth
-    if (
-      to.matched.some((record) => record.meta.requiresAuth) &&
-      !isAuthenticated
-    ) {
-      if (token_id) {
-        next(`/${token_id}/asset`);
+    //Enforce route requiresAuth, use the publicAlt if available, redirect to tokenID root if has one otherwise /
+    if (requiresAuth && !isAuthenticated) {
+      if (publicAltRoute && typeof publicAltRoute === 'string') {
+        next({ name: publicAltRoute });
       } else {
-        next('/');
-      } // Redirect to login page if not authenticated
+        if (token_id) {
+          next(`/${token_id}/asset`);
+        } else {
+          next('/');
+        }
+      }
     } else {
       next(); // Proceed as normal
     }

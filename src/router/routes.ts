@@ -1,5 +1,6 @@
 import LoginLayout from 'layouts/LoginLayout.vue';
 import MainLayout from 'layouts/MainLayout.vue';
+import IndexLayout from 'layouts/IndexLayout.vue';
 import CallbackLayout from 'layouts/CallbackLayout.vue';
 import ErrorNotFound from 'pages/ErrorNotFound.vue';
 import AssetFeature from 'pages/features/AssetFeature.vue';
@@ -14,11 +15,23 @@ export default [
     component: CallbackLayout,
   },
   {
-    path: '/:token_id',
+    path: '/logout',
     component: LoginLayout,
   },
   {
-    path: '/logout',
+    path: '/',
+    name: 'Index',
+    component: IndexLayout,
+    meta: { requiresAuth: true, publicAltRoute: 'rootLogin' },
+  },
+  {
+    path: '/',
+    name: 'rootLogin',
+    component: LoginLayout,
+  },
+  {
+    path: '/:token_id',
+    name: 'tokenLogin',
     component: LoginLayout,
   },
   {

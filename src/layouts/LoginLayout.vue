@@ -1,7 +1,12 @@
 <template>
-  <div v-if="asset.loading">Loading...</div>
-  <div v-else>
-    <q-layout view="hHh lpR fFf">
+  <q-layout view="hHh lpR fFf">
+    <div v-if="!token_id">
+      <div class="absolute-center text-center">
+        <passport-login-component />
+      </div>
+    </div>
+    <div v-else-if="asset.loading">Loading...</div>
+    <div v-else>
       <q-header elevated justify-between>
         <q-toolbar>
           <q-avatar>
@@ -20,29 +25,7 @@
               <span class="text-h5">
                 {{ asset.imx.metadata.name }}: {{ asset.imx.metadata.tagline }}
               </span>
-
-              <!-- Passport Login -->
-              <div style="padding-top: 10px">
-                <q-btn
-                  push
-                  no-caps
-                  rounded
-                  color="grey-1"
-                  @click="login"
-                  style="width: 240px">
-                  <div
-                    class="full-width row no-wrap justify-between items-center content-start">
-                    <q-img
-                      left
-                      src="/passport_logo_64px.svg"
-                      style="max-width: 50px" />
-                    <div class="text-center text-dark">
-                      Sign in with Immutable
-                    </div>
-                  </div>
-                </q-btn>
-              </div>
-
+              <passport-login-component />
               <!-- Guest Access -->
               <div style="padding-bottom: 20px">
                 <q-btn flat no-caps :to="`/${token_id}/asset`">
@@ -53,16 +36,16 @@
           </q-img>
         </div>
       </q-page-container>
-      <q-footer right>
-        <q-btn flat href="https://nevernerf.com" push no-caps>
-          <div class="row items-center no-wrap">
-            <q-icon left name="img:/NeverNerfLogo.svg" />
-            <div class="text-center">NeverNerf.com</div>
-          </div>
-        </q-btn>
-      </q-footer>
-    </q-layout>
-  </div>
+    </div>
+    <q-footer right>
+      <q-btn flat href="https://nevernerf.com" push no-caps>
+        <div class="row items-center no-wrap">
+          <q-icon left name="img:/NeverNerfLogo.svg" />
+          <div class="text-center">NeverNerf.com</div>
+        </div>
+      </q-btn>
+    </q-footer>
+  </q-layout>
 </template>
 
 <script>
@@ -70,8 +53,12 @@ import { usePassportStore } from '/src/stores/passport-store';
 import { onMounted, computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useAssetStore } from 'src/stores/asset-store';
+import PassportLoginComponent from 'src/components/PassportLoginComponent.vue';
 
 export default {
+  components: {
+    PassportLoginComponent,
+  },
   setup() {
     const passport = usePassportStore();
     const token_id = computed(() => useRoute().params.token_id);
@@ -82,13 +69,6 @@ export default {
       checkAuthentication();
       assetStore.loadMetadata(token_id.value);
     });
-
-    function login() {
-      passport.login();
-    }
-    function logout() {
-      passport.logout();
-    }
 
     async function checkAuthentication() {
       try {
@@ -104,9 +84,6 @@ export default {
     return {
       token_id,
       asset: computed(() => assetStore),
-      login,
-      logout,
-      buttonState: passport.buttonState,
     };
   },
 };
