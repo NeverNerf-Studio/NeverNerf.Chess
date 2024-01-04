@@ -67,7 +67,7 @@ export default {
 
     onMounted(() => {
       checkAuthentication();
-      assetStore.loadMetadata(token_id.value);
+      if (token_id.value) assetStore.loadMetadata(token_id.value);
     });
 
     async function checkAuthentication() {

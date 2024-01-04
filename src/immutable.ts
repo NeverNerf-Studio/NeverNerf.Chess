@@ -6,14 +6,14 @@ export class ImmutableService {
   constructor() {
     this.passportInstance = new passport.Passport({
       baseConfig: {
-        environment: config.Environment.SANDBOX,
-        publishableKey: 'NNdev',
+        environment: process.env.PASSPORT_env,
+        publishableKey: process.env.PASSPORT_publishableKey,
       },
-      clientId: 'gYbNCjXOPjhiYp3n0n7RQLMYq8tC3zAL',
+      clientId: process.env.PASSPORT_clientId,
       redirectUri: `${window.location.protocol}//${window.location.host}/#/callback`,
       logoutRedirectUri: `${window.location.protocol}//${window.location.host}/#//logout`,
-      audience: 'platform_api',
-      scope: 'openid offline_access email transact',
+      audience: process.env.PASSPORT_audience,
+      scope: process.env.PASSPORT_scope,
     });
   }
 

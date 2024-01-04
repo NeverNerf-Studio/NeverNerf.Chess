@@ -10,6 +10,9 @@
 
 const { configure } = require('quasar/wrappers');
 const path = require('path');
+require('dotenv').config({
+  path: `.env.${process.env.NODE_ENV.toLowerCase()}`,
+});
 
 module.exports = configure(function (/* ctx */) {
   return {
@@ -63,7 +66,16 @@ module.exports = configure(function (/* ctx */) {
 
       // publicPath: '/',
       // analyze: true,
-      // env: {},
+      env: {
+        PASSPORT_env: process.env.PASSPORT_env,
+        PASSPORT_publishableKey: process.env.PASSPORT_env,
+        PASSPORT_clientId:
+          process.env.PASSPORT_env === 'sandbox'
+            ? process.env.PASSPORT_TESTNET_clientId
+            : process.env.PASSPORT_MAINNET_clientId,
+        PASSPORT_audience: process.env.PASSPORT_env,
+        PASSPORT_scope: process.env.PASSPORT_env,
+      },
       // rawDefine: {}
       // ignorePublicFolder: true,
       // minify: false,
@@ -108,7 +120,7 @@ module.exports = configure(function (/* ctx */) {
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#devServer
     devServer: {
       // https: true
-      open: true, // opens browser window automatically
+      open: false, // opens browser window automatically
     },
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#framework

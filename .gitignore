@@ -2,6 +2,7 @@
 .thumbs.db
 node_modules
 .vscode
+.editorconfig
 
 # Lock files
 ./yarn.lock
@@ -38,6 +39,6 @@ yarn-error.log*
 *.njsproj
 *.sln
 
-# local .env files
-.env.local*
+#  .env files
+.env*
 yarn.lock
