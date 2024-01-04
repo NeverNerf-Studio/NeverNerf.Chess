@@ -6,10 +6,10 @@ export class ImmutableService {
   constructor() {
     this.passportInstance = new passport.Passport({
       baseConfig: {
-        environment: process.env.PASSPORT_env,
+        environment: process.env.PASSPORT_env as config.Environment,
         publishableKey: process.env.PASSPORT_publishableKey,
       },
-      clientId: process.env.PASSPORT_clientId,
+      clientId: process.env.PASSPORT_clientId as string,
       redirectUri: `${window.location.protocol}//${window.location.host}/#/callback`,
       logoutRedirectUri: `${window.location.protocol}//${window.location.host}/#//logout`,
       audience: process.env.PASSPORT_audience,
