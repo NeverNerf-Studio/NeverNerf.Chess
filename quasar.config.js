@@ -68,13 +68,13 @@ module.exports = configure(function (/* ctx */) {
       // analyze: true,
       env: {
         PASSPORT_env: process.env.PASSPORT_env,
-        PASSPORT_publishableKey: process.env.PASSPORT_env,
+        PASSPORT_publishableKey: process.env.PASSPORT_publishableKey,
         PASSPORT_clientId:
           process.env.PASSPORT_env === 'sandbox'
             ? process.env.PASSPORT_TESTNET_clientId
             : process.env.PASSPORT_MAINNET_clientId,
-        PASSPORT_audience: process.env.PASSPORT_env,
-        PASSPORT_scope: process.env.PASSPORT_env,
+        PASSPORT_audience: process.env.PASSPORT_audience,
+        PASSPORT_scope: process.env.PASSPORT_scope,
       },
       // rawDefine: {}
       // ignorePublicFolder: true,
