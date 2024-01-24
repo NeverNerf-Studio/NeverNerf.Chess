@@ -43,3 +43,6 @@ yarn-error.log*
 .env*
 !.env.example
 yarn.lock
+
+# imx_metadata related directories and files
+/public/imx_metadata/*
