@@ -8,12 +8,12 @@
     <div v-else-if="asset.loading">Loading...</div>
     <div v-else>
       <q-header elevated justify-between>
-        <q-toolbar>
+        <q-toolbar v-if="asset.imx">
           <q-avatar>
-            <img src="/imx_metadata/collection_icon.png" />
+            <img src="{{ asset.imx.metadata.name }}" />
           </q-avatar>
           <q-toolbar-title>
-            <span v-if="asset.imx">{{ asset.imx.collection.name }}</span>
+            <span>{{ asset.imx.collection.icon_url }}</span>
           </q-toolbar-title>
         </q-toolbar>
       </q-header>

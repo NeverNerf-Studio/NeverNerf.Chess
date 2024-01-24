@@ -10,9 +10,6 @@
 
 const { configure } = require('quasar/wrappers');
 const path = require('path');
-require('dotenv').config({
-  path: `.env.${process.env.NODE_ENV.toLowerCase()}`,
-});
 
 module.exports = configure(function (/* ctx */) {
   return {
@@ -66,16 +63,9 @@ module.exports = configure(function (/* ctx */) {
 
       // publicPath: '/',
       // analyze: true,
-      env: {
-        PASSPORT_env: process.env.PASSPORT_env,
-        PASSPORT_publishableKey: process.env.PASSPORT_publishableKey,
-        PASSPORT_clientId:
-          process.env.PASSPORT_env === 'sandbox'
-            ? process.env.PASSPORT_TESTNET_clientId
-            : process.env.PASSPORT_MAINNET_clientId,
-        PASSPORT_audience: process.env.PASSPORT_audience,
-        PASSPORT_scope: process.env.PASSPORT_scope,
-      },
+      env: require('dotenv').config({
+        path: `.env.${process.env.NODE_ENV.toLowerCase()}`,
+      }).parsed,
       // rawDefine: {}
       // ignorePublicFolder: true,
       // minify: false,
