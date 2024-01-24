@@ -10,10 +10,10 @@
       <q-header elevated justify-between>
         <q-toolbar v-if="asset.imx">
           <q-avatar>
-            <img src="{{ asset.imx.metadata.name }}" />
+            <img :src="asset.imx.collection.icon_url" />
           </q-avatar>
           <q-toolbar-title>
-            <span>{{ asset.imx.collection.icon_url }}</span>
+            <span>{{ asset.imx.metadata.name }}</span>
           </q-toolbar-title>
         </q-toolbar>
       </q-header>
