@@ -35,8 +35,7 @@ export default function (/* { store, ssrContext } */) {
       console.log(from);
       console.log('passport: ');
       console.log(passport);
-      console.log('isAuthenticated / userInfo: ');
-      console.log(isAuthenticated);
+      console.log('isAuthenticated: ' + isAuthenticated);
       console.log('requiresAuth: ' + requiresAuth);
       console.log('publicAltRoute: ' + publicAltRoute);
       console.log('token_id: ' + token_id);
