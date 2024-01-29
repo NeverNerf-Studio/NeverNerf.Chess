@@ -53,7 +53,9 @@ export const useAssetStore = defineStore('asset', {
 
       this.loading = true;
       try {
-        const response = await fetch(`/imx_metadata/${token_id}.json`);
+        const response = await fetch(
+          `/imx_metadata/${token_id}/${token_id}.json`
+        );
         if (!response.ok) {
           throw new Error(`Network response was not ok for token: ${token_id}`);
         }
