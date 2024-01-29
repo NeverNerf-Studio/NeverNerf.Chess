@@ -1,0 +1,270 @@
+##Context##
+Given this Quasar vue app:
+.
+├── LICENSE
+├── README.md
+├── ch
+│   ├── ch_implement.sh
+│   ├── ch_implement.txt
+│   ├── chatGPThelp.sh
+│   ├── chatGPThelp.txt
+│   └── error.txt
+├── index.html
+├── package.json
+├── postcss.config.cjs
+├── public
+│   ├── NeverNerfLogo.svg
+│   ├── favicon.ico
+│   ├── imx_metadata
+│   └── passport_logo_64px.svg
+├── quasar.config.js
+├── src
+│   ├── App.vue
+│   ├── assets
+│   │   └── quasar-logo-vertical.svg
+│   ├── boot
+│   │   ├── axios.ts
+│   │   ├── i18n.ts
+│   │   └── immutable.ts
+│   ├── components
+│   │   └── PassportLoginComponent.vue
+│   ├── css
+│   │   ├── app.scss
+│   │   └── quasar.variables.scss
+│   ├── env.d.ts
+│   ├── i18n
+│   │   ├── en-US
+│   │   │   └── index.ts
+│   │   └── index.ts
+│   ├── immutable.ts
+│   ├── layouts
+│   │   ├── CallbackLayout.vue
+│   │   ├── IndexLayout.vue
+│   │   ├── LoginLayout.vue
+│   │   └── MainLayout.vue
+│   ├── pages
+│   │   ├── ErrorNotFound.vue
+│   │   └── features
+│   │       ├── AssetFeature.vue
+│   │       ├── AssureFeature.vue
+│   │       ├── CraftingFeature.vue
+│   │       ├── GameplayFeature.vue
+│   │       └── SettingsFeature.vue
+│   ├── quasar.d.ts
+│   ├── router
+│   │   ├── index.ts
+│   │   └── routes.ts
+│   ├── shims-vue.d.ts
+│   └── stores
+│       ├── asset-store.ts
+│       ├── example-store.ts
+│       ├── index.ts
+│       ├── passport-store.ts
+│       └── store-flag.d.ts
+└── tsconfig.json
+
+16 directories, 46 files
+
+
+And given the below files:
+
+File: package.json
+{
+  "name": "nevernerf-app",
+  "version": "0.0.1",
+  "description": "NeverNerf",
+  "productName": "NeverNerf_App",
+  "author": "sgr_nz",
+  "private": true,
+  "scripts": {
+    "lint": "eslint --ext .js,.ts,.vue ./",
+    "format": "prettier --write \"**/*.{js,ts,vue,scss,html,md,json}\" --ignore-path .gitignore",
+    "test": "echo \"No test specified\" && exit 0",
+    "dev": "quasar dev",
+    "build": "quasar build",
+    "servebuild": "quasar build -d && cd dist/spa && quasar serve -H localhost -p 9000 -o"
+  },
+  "dependencies": {
+    "@quasar/cli": "^2.3.0",
+    "@quasar/extras": "^1.16.4",
+    "axios": "^1.2.1",
+    "events": "^3.3.0",
+    "pinia": "^2.0.11",
+    "quasar": "^2.6.0",
+    "vue": "^3.0.0",
+    "vue-i18n": "^9.2.2",
+    "vue-router": "^4.0.0"
+  },
+  "devDependencies": {
+    "@imtbl/sdk": "^0.44.4",
+    "@intlify/vite-plugin-vue-i18n": "^3.3.1",
+    "@quasar/app-vite": "^1.3.0",
+    "@types/node": "^12.20.21",
+    "@typescript-eslint/eslint-plugin": "^5.10.0",
+    "@typescript-eslint/parser": "^5.10.0",
+    "autoprefixer": "^10.4.2",
+    "dotenv": "^16.3.1",
+    "eslint": "^8.10.0",
+    "eslint-config-prettier": "^8.1.0",
+    "eslint-plugin-vue": "^9.0.0",
+    "prettier": "^2.5.1",
+    "typescript": "^4.5.4"
+  },
+  "engines": {
+    "node": "^20 || ^16 || ^14.19",
+    "npm": ">= 6.13.4",
+    "yarn": ">= 1.21.1"
+  }
+}
+
+File: src/stores/asset-store.ts
+import { defineStore } from 'pinia';
+
+interface IMXMetadata {
+  token_address: string;
+  token_id: string;
+  id: string;
+  user: string;
+  status: string;
+  uri: string | null;
+  name: string;
+  description: string | null;
+  image_url: string;
+  metadata: {
+    name: string;
+    type: number;
+    class: string;
+    series: string;
+    assetId: string;
+    element: string;
+    faction: string;
+    tagline: string;
+    image_url: string;
+    rarityStr: string;
+    serialNumber: string;
+    animation_url: string;
+    specialEditionStr: string;
+    animation_url_mime_type: string;
+  };
+  collection: {
+    name: string;
+    icon_url: string;
+  };
+  created_at: string;
+  updated_at: string;
+}
+
+interface AssetState {
+  [key: string]: string; // or any, if the types of asset properties vary
+}
+
+interface CollectionConfig {
+  asset: Record<string, string>;
+}
+
+export const useAssetStore = defineStore('asset', {
+  state: () => ({
+    imx: null as IMXMetadata | null,
+    asset: {} as AssetState,
+    loading: false, // Add a loading state
+  }),
+  actions: {
+    async loadMetadata(token_id: string) {
+      if (!token_id) {
+        console.error('TokenID not provided');
+        return;
+      }
+
+      if (this.imx && this.imx.token_id === token_id) {
+        console.log('Data already loaded for this token:', token_id);
+        return; // Avoid reloading if data is already present
+      }
+
+      this.loading = true;
+      try {
+        //Load token metadata
+        const response = await fetch(
+          `/imx_metadata/${token_id}/${token_id}.json`
+        );
+        if (!response.ok) {
+          throw new Error(`Network response was not ok for token: ${token_id}`);
+        }
+        this.imx = await response.json();
+        console.log('Data loaded for token:', token_id);
+
+        //Load asset configuration from collection metadata
+        if (this.imx) {
+          const collectionId = this.imx.token_address;
+          const collectionConfigResponse = await fetch(
+            `/imx_metadata/${collectionId}.json`
+          );
+          if (!collectionConfigResponse.ok) {
+            throw new Error(
+              `Network response was not ok for collection: ${collectionId}`
+            );
+          }
+          const collectionConfig = await collectionConfigResponse.json();
+          console.log('Data loaded for collection:', collectionId);
+
+          this.asset = this.setAssetProperties(collectionConfig);
+        }
+      } catch (error) {
+        console.error('Error loading metadata:', error);
+        this.imx = null; // Only reset if this is intended on error
+      } finally {
+        this.loading = false;
+      }
+    },
+    setAssetProperties(collectionConfig: CollectionConfig): AssetState {
+      const newAssetState: AssetState = {};
+
+      for (const [key, value] of Object.entries(collectionConfig.asset)) {
+        const path = value.split('.');
+        let currentContext = this.imx; // Start with the current store context
+
+        for (const p of path) {
+          // Access the nested property if it exists
+          if (currentContext[p] !== undefined) {
+            currentContext = currentContext[p];
+          } else {
+            // Property does not exist in the path
+            console.warn(`Property ${p} not found in path ${value}`);
+            currentContext = null;
+            break;
+          }
+        }
+
+        if (currentContext !== null) {
+          newAssetState[key] = currentContext;
+        }
+      }
+
+      return newAssetState;
+    },
+  },
+});
+
+File: public/imx_metadata/0x73f8af973f6173c4b4e06048a2d723e975a903cf.json
+{
+  "asset": {
+    "hero_image": "imx.metadata.image_url"
+  },
+  "style": {
+    "features": {
+      "LoginLayout": {
+        "hero_image_class": "fit"
+      }
+    }
+  }
+}
+
+
+##Task##
+Fix the following error: 'currentContext' is possibly 'null'.ts(18047)
+
+##Instructions##
+As a world class full stack Quasar developer:
+Your task is to think step by step and provide specific code changes that are production ready.
+You will be penalized if you skip steps, add placeholders or TODOs for other developers.
+If that's not possible then you MUST write code that will test and provide you additional information needed to understand the problem better.
+I'm going to tip $400 for a better solution!

@@ -1,0 +1,147 @@
+This is my current src/pages/CollectionView.vue:
+
+<template>
+  <div class="q-pa-md">
+    <q-table
+      title="Your NeverNerf Collections"
+      :rows="collections"
+      :columns="columns"
+      :pagination="pagination"
+      row-key="address"
+      @row-click="onRowClick"
+    >
+      <!-- No Data Slot -->
+      <template v-slot:no-data>
+        <div class="text-center q-py-md">No collections available</div>
+      </template>
+
+      <!-- Loading Slot -->
+      <template v-slot:loading>
+        <q-inner-loading :visible="loading" />
+      </template>
+    </q-table>
+  </div>
+  <q-btn label="Create Collection" icon="add" @click="showCollectionForm" />
+  <q-dialog v-model="showForm">
+    <collection-form :collection="selectedCollection" @save="handleSave" />
+  </q-dialog>
+</template>
+
+<script lang="ts">
+import { defineComponent, onMounted, ref } from 'vue';
+import { usePassportStore } from 'src/stores/passport-store';
+import { Collection, ImmutableService } from 'src/services/immutable';
+import { QTableColumn, date } from 'quasar';
+import CollectionForm from 'src/components/CollectionForm.vue';
+
+export default defineComponent({
+  name: 'CollectionView',
+  components: { CollectionForm },
+  setup() {
+    const passport = usePassportStore();
+    const collections = ref<Collection[]>([]);
+    const pagination = ref({
+      sortBy: 'name',
+      descending: true,
+      page: 1,
+      rowsPerPage: 10,
+    });
+
+    const columns: QTableColumn[] = [
+      {
+        name: 'name',
+        required: true,
+        label: 'Name',
+        align: 'left',
+        field: 'name',
+        sortable: true,
+      },
+      {
+        name: 'description',
+        label: 'Description',
+        align: 'left',
+        field: 'description',
+        sortable: true,
+      },
+      {
+        name: 'created_at',
+        label: 'Created At',
+        align: 'left',
+        field: (row: Collection) =>
+          row.created_at ? date.formatDate(row.created_at, 'YYYY-MM-DD') : '',
+        sortable: true,
+      },
+      {
+        name: 'project_id',
+        label: 'Project ID',
+        align: 'left',
+        field: 'project_id',
+        sortable: true,
+      },
+      // Add additional columns as needed
+    ];
+
+    const loading = ref(false);
+    const showForm = ref(false);
+    const selectedCollection = ref<Collection | null>(null);
+    const immutableService = new ImmutableService(); // Assuming you have such a constructor
+
+    const fetchCollections = async () => {
+      loading.value = true;
+      try {
+        const ownCollections = await passport.getCollections();
+        collections.value = ownCollections || [];
+      } catch (error) {
+        console.error('Error fetching collections:', error);
+        // Consider showing an error message to the user
+      } finally {
+        loading.value = false;
+      }
+    };
+
+    onMounted(fetchCollections);
+
+    const handleSave = async (collection: Collection) => {
+      try {
+        if (selectedCollection.value) {
+          await immutableService.updateCollection(
+            selectedCollection.value.address,
+            collection
+          );
+        } else {
+          await immutableService.createCollection(collection);
+        }
+        await fetchCollections(); // Refresh the collections list
+        showForm.value = false;
+        // Optionally, show a success message to the user
+      } catch (error) {
+        console.error('Error saving collection:', error);
+        // Show an error message to the user
+      }
+    };
+
+    return {
+      loading,
+      collections,
+      pagination,
+      columns,
+      showForm,
+      selectedCollection,
+      handleSave,
+      fetchCollections,
+      // ... other reactive properties and methods ...
+    };
+  },
+});
+</script>
+
+
+##Task##
+Implement the above steps.
+
+##Instructions##
+As a world class full stack Quasar developer:
+Your task is to think step by step and provide specific code changes that are production ready.
+You will be penalized if you skip steps, add placeholders or TODOs for other developers.
+If that's not possible then you MUST write code that will test and provide you additional information needed to understand the problem better.
+I'm going to tip $400 for a better solution!

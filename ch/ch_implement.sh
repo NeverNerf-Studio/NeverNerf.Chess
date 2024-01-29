@@ -1,0 +1,20 @@
+file="src/pages/CollectionView.vue"
+#File3="quasar.config.js"
+#File4="src/stores/passport-store.ts"
+#File5="src/components/LoginComponent.vue"
+#File6="src/services/immutable.ts"
+#File4="ch/error.txt"
+
+echo "This is my current $file:\n"
+cat "$file"
+
+echo "\n\n##Task##"
+echo "Implement the above steps."
+
+echo "\n##Instructions##"
+echo "As a world class full stack Quasar developer:"
+echo "Your task is to think step by step and provide specific code changes that are production ready."
+echo "You will be penalized if you skip steps, add placeholders or TODOs for other developers."
+echo "If that's not possible then you MUST write code that will test and provide you additional information needed to understand the problem better."
+echo "I'm going to tip \$400 for a better solution!"
+#echo "\n\nAs a world class full stack Quasar vuejs developer recommend an approach to solve this problem: The getCollections() in passport-store.ts needs to return only the current users collections, the issue is that the Immutable listCollections API doesn't support filtering. The solution is to make a request to the API at application startup, poll through the pages (defaults to 100 records per page, API supplies cursor) and retain a local cache that can be cached and filtered (it's under 1000 records). Ideally this cache persists betweeen across runtime sessions, isn't persisted in github, can be easily be recreated but doesn't need to every time the app is restarted."

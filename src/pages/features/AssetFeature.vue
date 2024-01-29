@@ -1,7 +1,7 @@
 <template>
   <div v-if="asset?.imx?.metadata" class="q-pa-md">
     <q-img
-      :src="asset.imx.metadata.animation_url"
+      :src="asset.standardValues.hero_image"
       class="rounded-borders q-mx-auto row justify-between"
       style="max-height: 50vh; max-width: 50vh" />
 
