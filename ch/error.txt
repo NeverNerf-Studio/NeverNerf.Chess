@@ -1,0 +1,2 @@
+duplexify.js:44 Uncaught TypeError: Class extends value undefined is not a constructor or null
+    at duplexify.js:44:25
