@@ -1,0 +1,10 @@
+<svg width="250" height="252" viewBox="0 0 250 252" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="LogoVector">
+<path d="M249 1H199V108L149 1H99V40.5L199 251H249V1Z" fill="white"/>
+<path d="M1 251H51V144L101 251H151V211.5L51 1H1L1 251Z" fill="white"/>
+<path d="M151 164L99 59V84.5L151 193.5V164Z" fill="white"/>
+<path d="M249 1H199V108L149 1H99V40.5L199 251H249V1Z" stroke="white"/>
+<path d="M1 251H51V144L101 251H151V211.5L51 1H1L1 251Z" stroke="white"/>
+<path d="M151 164L99 59V84.5L151 193.5V164Z" stroke="white"/>
+</g>
+</svg>
