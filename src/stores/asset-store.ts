@@ -12,6 +12,7 @@ interface IMXMetadata {
   image_url: string;
   metadata: {
     name: string;
+    FEN: string;
     type: number;
     class: string;
     series: string;

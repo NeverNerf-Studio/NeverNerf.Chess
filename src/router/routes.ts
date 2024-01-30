@@ -50,7 +50,7 @@ export default [
         path: 'gameplay',
         name: 'Gameplay',
         icon: 'sports_esports',
-        meta: { requiresAuth: true },
+        meta: { requiresAuth: false },
         component: GameplayFeature,
       },
       {

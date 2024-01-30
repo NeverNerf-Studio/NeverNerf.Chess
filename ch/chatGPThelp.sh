@@ -1,8 +1,8 @@
 
 #File1="ch/spec.txt"
 File1="package.json"
-File2="src/stores/asset-store.ts"
-File3="public/imx_metadata/0x73f8af973f6173c4b4e06048a2d723e975a903cf.json"
+File2="src/pages/features/GameplayFeature.vue"
+File3="src/pages/features/AssetFeature.vue"
 #File3="quasar.config.js"
 #File4="src/stores/passport-store.ts"
 #File5="src/components/LoginComponent.vue"
@@ -31,7 +31,7 @@ check_and_cat_file "$File2"
 check_and_cat_file "$File3"
 
 echo "\n\n##Task##"
-echo "Fix the following error: 'currentContext' is possibly 'null'.ts(18047)"
+echo "Refactor GameplayFeature.vue to use the same sytax (e.g. setup()) and best practices as AssetFeature.vue, fix any errors if present."
 
 echo "\n##Instructions##"
 echo "As a world class full stack Quasar developer:"

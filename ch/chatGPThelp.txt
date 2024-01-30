@@ -14,6 +14,20 @@ Given this Quasar vue app:
 ├── postcss.config.cjs
 ├── public
 │   ├── NeverNerfLogo.svg
+│   ├── chesspieces
+│   │   └── wikipedia
+│   │       ├── bB.png
+│   │       ├── bK.png
+│   │       ├── bN.png
+│   │       ├── bP.png
+│   │       ├── bQ.png
+│   │       ├── bR.png
+│   │       ├── wB.png
+│   │       ├── wK.png
+│   │       ├── wN.png
+│   │       ├── wP.png
+│   │       ├── wQ.png
+│   │       └── wR.png
 │   ├── favicon.ico
 │   ├── imx_metadata
 │   └── passport_logo_64px.svg
@@ -63,7 +77,7 @@ Given this Quasar vue app:
 │       └── store-flag.d.ts
 └── tsconfig.json
 
-16 directories, 46 files
+18 directories, 58 files
 
 
 And given the below files:
@@ -117,153 +131,213 @@ File: package.json
   }
 }
 
-File: src/stores/asset-store.ts
-import { defineStore } from 'pinia';
+File: src/pages/features/GameplayFeature.vue
+<template>
+  <div class="q-my-md text-center">
+    <h5>Gameplay</h5>
+    <div id="myBoard"></div>
+    <!-- Ensure this ID matches your script's target -->
+  </div>
+</template>
 
-interface IMXMetadata {
-  token_address: string;
-  token_id: string;
-  id: string;
-  user: string;
-  status: string;
-  uri: string | null;
-  name: string;
-  description: string | null;
-  image_url: string;
-  metadata: {
-    name: string;
-    type: number;
-    class: string;
-    series: string;
-    assetId: string;
-    element: string;
-    faction: string;
-    tagline: string;
-    image_url: string;
-    rarityStr: string;
-    serialNumber: string;
-    animation_url: string;
-    specialEditionStr: string;
-    animation_url_mime_type: string;
-  };
-  collection: {
-    name: string;
-    icon_url: string;
-  };
-  created_at: string;
-  updated_at: string;
-}
+<script>
+import { onMounted, computed } from 'vue';
+import { useRoute } from 'vue-router';
+import { useAssetStore } from 'src/stores/asset-store';
 
-interface AssetState {
-  [key: string]: string; // or any, if the types of asset properties vary
-}
-
-interface CollectionConfig {
-  asset: Record<string, string>;
-}
-
-export const useAssetStore = defineStore('asset', {
-  state: () => ({
-    imx: null as IMXMetadata | null,
-    asset: {} as AssetState,
-    loading: false, // Add a loading state
-  }),
-  actions: {
-    async loadMetadata(token_id: string) {
-      if (!token_id) {
-        console.error('TokenID not provided');
-        return;
-      }
-
-      if (this.imx && this.imx.token_id === token_id) {
-        console.log('Data already loaded for this token:', token_id);
-        return; // Avoid reloading if data is already present
-      }
-
-      this.loading = true;
-      try {
-        //Load token metadata
-        const response = await fetch(
-          `/imx_metadata/${token_id}/${token_id}.json`
-        );
-        if (!response.ok) {
-          throw new Error(`Network response was not ok for token: ${token_id}`);
-        }
-        this.imx = await response.json();
-        console.log('Data loaded for token:', token_id);
-
-        //Load asset configuration from collection metadata
-        if (this.imx) {
-          const collectionId = this.imx.token_address;
-          const collectionConfigResponse = await fetch(
-            `/imx_metadata/${collectionId}.json`
-          );
-          if (!collectionConfigResponse.ok) {
-            throw new Error(
-              `Network response was not ok for collection: ${collectionId}`
-            );
-          }
-          const collectionConfig = await collectionConfigResponse.json();
-          console.log('Data loaded for collection:', collectionId);
-
-          this.asset = this.setAssetProperties(collectionConfig);
-        }
-      } catch (error) {
-        console.error('Error loading metadata:', error);
-        this.imx = null; // Only reset if this is intended on error
-      } finally {
-        this.loading = false;
-      }
+export default {
+  name: 'NeverNerfChessboard',
+  setup() {
+    const token_id = computed(() => useRoute().params.token_id);
+    const assetStore = useAssetStore();
+  },
+  mounted() {
+    //TODO this seems gross
+    this.loadjQuery();
+    this.loadChessCSS();
+    this.loadChessboardScript();
+    assetStore.loadMetadata(token_id.value);
+  },
+  methods: {
+    loadjQuery() {
+      const script = document.createElement('script');
+      script.src = 'https://code.jquery.com/jquery-3.5.1.min.js';
+      script.integrity =
+        'sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2';
+      script.crossOrigin = 'anonymous';
+      document.head.appendChild(script);
     },
-    setAssetProperties(collectionConfig: CollectionConfig): AssetState {
-      const newAssetState: AssetState = {};
-
-      for (const [key, value] of Object.entries(collectionConfig.asset)) {
-        const path = value.split('.');
-        let currentContext = this.imx; // Start with the current store context
-
-        for (const p of path) {
-          // Access the nested property if it exists
-          if (currentContext[p] !== undefined) {
-            currentContext = currentContext[p];
-          } else {
-            // Property does not exist in the path
-            console.warn(`Property ${p} not found in path ${value}`);
-            currentContext = null;
-            break;
-          }
-        }
-
-        if (currentContext !== null) {
-          newAssetState[key] = currentContext;
-        }
+    loadChessCSS() {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href =
+        'https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css';
+      link.integrity =
+        'sha384-q94+BZtLrkL1/ohfjR8c6L+A6qzNH9R2hBLwyoAfu3i/WCvQjzL2RQJ3uNHDISdU';
+      link.crossOrigin = 'anonymous';
+      document.head.appendChild(link);
+    },
+    loadChessboardScript() {
+      const script = document.createElement('script');
+      script.src =
+        'https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js';
+      script.integrity =
+        'sha384-8Vi8VHwn3vjQ9eUHUxex3JSN/NFqUg3QbPyX8kWyb93+8AC/pPWTzj+nHtbC5bxD';
+      script.crossOrigin = 'anonymous';
+      script.onload = () => this.initializeChessboard();
+      document.head.appendChild(script);
+    },
+    initializeChessboard() {
+      function pieceTheme(piece) {
+        // wikipedia theme
+        return '/chesspieces/wikipedia/' + piece + '.png';
       }
 
-      return newAssetState;
+      var config = {
+        pieceTheme: pieceTheme,
+        position: assetStore.imx.metadata.FEN,
+      };
+
+      //TODO another sign this implementation is messy
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      var board = Chessboard('myBoard', config);
     },
   },
+};
+</script>
+
+File: src/pages/features/AssetFeature.vue
+<template>
+  <div v-if="asset?.imx?.metadata" class="q-pa-md">
+    <q-img
+      :src="asset.standardValues.hero_image"
+      class="rounded-borders q-mx-auto row justify-between"
+      style="max-height: 50vh; max-width: 50vh" />
+
+    <div class="q-my-md text-center">
+      <div class="text-h5 q-my-md">{{ asset.imx.metadata.name }}</div>
+      <div class="text-subtitle2 q-my-md">{{ asset.imx.metadata.tagline }}</div>
+
+      <q-list>
+        <q-item
+          v-for="(value, key) in filteredMetadata"
+          :key="key"
+          class="row justify-between">
+          <q-item-section>{{ key }}:</q-item-section>
+          <q-item-section>{{ value }}</q-item-section>
+        </q-item>
+      </q-list>
+    </div>
+
+    <q-expansion-item icon="data_object" label="All Metadata" dense>
+      <div v-for="(value, key) in asset.imx" :key="key">
+        <div v-if="isObjectType(value)">
+          <div class="text-subtitle1 q-my-md">{{ key }}</div>
+          <q-separator />
+          <div v-for="(nestedValue, nestedKey) in value" :key="nestedKey">
+            <q-item class="q-py-xs">
+              <q-item-section>{{ nestedKey }}:</q-item-section>
+              <q-item-section>{{ formatValue(nestedValue) }}</q-item-section>
+              <q-item-section side>
+                <q-btn
+                  icon="content_copy"
+                  @click="copyToClipboard(nestedValue)"
+                  flat
+                  dense />
+              </q-item-section>
+            </q-item>
+          </div>
+        </div>
+        <div v-else>
+          <q-item class="q-py-xs">
+            <q-item-section>{{ key }}:</q-item-section>
+            <q-item-section>{{ formatValue(value) }}</q-item-section>
+            <q-item-section side>
+              <q-btn
+                icon="content_copy"
+                @click="copyToClipboard(value)"
+                flat
+                dense />
+            </q-item-section>
+          </q-item>
+        </div>
+      </div>
+    </q-expansion-item>
+  </div>
+  <div v-else class="text-h6 text-center q-my-md">Loading...</div>
+</template>
+
+<script setup>
+import { onMounted, computed } from 'vue';
+import { useAssetStore } from 'src/stores/asset-store';
+import { useRoute } from 'vue-router';
+
+const asset = computed(() => assetStore);
+const token_id = computed(() => useRoute().params.token_id);
+const assetStore = useAssetStore();
+onMounted(() => {
+  assetStore.loadMetadata(token_id.value);
 });
 
-File: public/imx_metadata/0x73f8af973f6173c4b4e06048a2d723e975a903cf.json
-{
-  "asset": {
-    "hero_image": "imx.metadata.image_url"
-  },
-  "style": {
-    "features": {
-      "LoginLayout": {
-        "hero_image_class": "fit"
-      }
-    }
+const filteredMetadata = computed(() => {
+  // Check if asset is not loaded or is undefined/null
+  if (!asset.value || asset.value.loading) {
+    // Return an empty object or any other default value
+    return {};
   }
+  const keysToInclude = [
+    'class',
+    'series',
+    'element',
+    'faction',
+    'rarityStr',
+    'specialEditionStr',
+  ];
+  const metadata = asset.value.imx.metadata;
+  return keysToInclude.reduce((filtered, key) => {
+    if (metadata[key] !== undefined) {
+      filtered[key] = metadata[key];
+    }
+    return filtered;
+  }, {});
+});
+
+const truncateText = (text) => {
+  if (typeof text === 'string' && text.length > 20) {
+    return text.substr(0, 5) + '...' + text.substr(-5);
+  }
+  return text;
+};
+
+const formatValue = (value) => {
+  if (typeof value === 'object') {
+    return JSON.stringify(value, null, 2);
+  }
+  return truncateText(value);
+};
+
+const isObjectType = (value) => {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
+};
+
+const copyToClipboard = (text) => {
+  navigator.clipboard.writeText(text);
+};
+</script>
+
+<style scoped>
+.rounded-borders {
+  border-radius: 4px;
 }
+</style>
 
 
 ##Task##
-Fix the following error: 'currentContext' is possibly 'null'.ts(18047)
+Refactor GameplayFeature.vue to use the same sytax (e.g. setup()) and best practices as AssetFeature.vue, fix any errors if present.
 
 ##Instructions##
 As a world class full stack Quasar developer:
+The project is written in TypeScript, avoid eslint issues e.g. Unexpected any. Specify a different type.eslint@typescript-eslint/no-explicit-any
 Your task is to think step by step and provide specific code changes that are production ready.
 You will be penalized if you skip steps, add placeholders or TODOs for other developers.
 If that's not possible then you MUST write code that will test and provide you additional information needed to understand the problem better.
