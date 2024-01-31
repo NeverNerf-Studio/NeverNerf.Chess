@@ -20,7 +20,8 @@
       <q-page-container>
         <div v-if="asset.imx">
           <!-- Asset hero image -->
-          <q-img :src="asset.imx.metadata.image_url" class="fixed-full">
+          <div class="fixed-full">
+            <ChessboardComponent />
             <div class="absolute-bottom text-center">
               <span class="text-h5">
                 {{ asset.imx.metadata.name }}: {{ asset.imx.metadata.tagline }}
@@ -33,7 +34,7 @@
                 </q-btn>
               </div>
             </div>
-          </q-img>
+          </div>
         </div>
       </q-page-container>
     </div>
@@ -54,10 +55,12 @@ import { onMounted, computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useAssetStore } from 'src/stores/asset-store';
 import PassportLoginComponent from 'src/components/PassportLoginComponent.vue';
+import ChessboardComponent from 'src/components/ChessboardSVG.vue';
 
 export default {
   components: {
     PassportLoginComponent,
+    ChessboardComponent,
   },
   setup() {
     const passport = usePassportStore();

@@ -56,8 +56,17 @@ export const useAssetStore = defineStore('asset', {
         return;
       }
 
+      // if (process.env.DEV) {
+      //   console.group('AssetStore loadMetadata:');
+      //   console.log('token_id provided: ');
+      //   console.log(token_id);
+      //   console.log('token_id already loaded: ');
+      //   console.log(this.imx?.token_id);
+      //   console.groupEnd();
+      // }
+
       if (this.imx && this.imx.token_id === token_id) {
-        console.log('Data already loaded for this token:', token_id);
+        //console.log('Data already loaded for this token:', token_id);
         return; // Avoid reloading if data is already present
       }
 

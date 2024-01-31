@@ -1,9 +1,6 @@
 <template>
   <div v-if="asset?.imx?.metadata" class="q-pa-md">
-    <q-img
-      :src="asset.standardValues.hero_image"
-      class="rounded-borders q-mx-auto row justify-between"
-      style="max-height: 50vh; max-width: 50vh" />
+    <ChessboardComponent />
 
     <div class="q-my-md text-center">
       <div class="text-h5 q-my-md">{{ asset.imx.metadata.name }}</div>
@@ -62,6 +59,7 @@
 import { onMounted, computed } from 'vue';
 import { useAssetStore } from 'src/stores/asset-store';
 import { useRoute } from 'vue-router';
+import ChessboardComponent from 'src/components/ChessboardSVG.vue';
 
 const asset = computed(() => assetStore);
 const token_id = computed(() => useRoute().params.token_id);

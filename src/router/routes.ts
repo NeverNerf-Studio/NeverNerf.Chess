@@ -8,6 +8,7 @@ import GameplayFeature from 'pages/features/GameplayFeature.vue';
 import CraftingFeature from 'pages/features/CraftingFeature.vue';
 import AssureFeature from 'pages/features/AssureFeature.vue';
 import SettingsFeature from 'pages/features/SettingsFeature.vue';
+import ChessboardSVG from 'src/components/ChessboardSVG.vue';
 
 export default [
   {
@@ -33,6 +34,11 @@ export default [
     path: '/:token_id',
     name: 'tokenLogin',
     component: LoginLayout,
+  },
+  {
+    path: '/:token_id/board.svg',
+    name: 'ChessboardSVG',
+    component: ChessboardSVG,
   },
   {
     path: '/:token_id',

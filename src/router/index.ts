@@ -6,6 +6,7 @@ import {
 } from 'vue-router';
 import routes from './routes';
 import { usePassportStore } from 'src/stores/passport-store'; // Import Passport store
+import { useAssetStore } from 'src/stores/asset-store'; // Import Asset store
 
 export default function (/* { store, ssrContext } */) {
   const createHistory = process.env.SERVER
@@ -25,7 +26,10 @@ export default function (/* { store, ssrContext } */) {
     const isAuthenticated = await passport.getUserInfo(); // Check if the user is authenticated
     const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
     const publicAltRoute = to.meta.publicAltRoute;
-    const token_id = to.params.token_id;
+    const token_id = to.params.token_id as string;
+    const from_token_id = from.params.token_id as string;
+    if (token_id !== from_token_id)
+      await useAssetStore().loadMetadata(token_id);
 
     if (process.env.DEV) {
       console.group('Router.beforeEach debug:');
@@ -42,7 +46,7 @@ export default function (/* { store, ssrContext } */) {
       console.groupEnd();
     }
 
-    if (to.path == '/logout') next(`/${from.params.token_id}/asset`);
+    if (to.path == '/logout') next(`/${token_id}/asset`);
 
     //Enforce route requiresAuth, use the publicAlt if available, redirect to tokenID root if has one otherwise /
     if (requiresAuth && !isAuthenticated) {
