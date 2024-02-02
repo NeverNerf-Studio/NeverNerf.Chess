@@ -8,7 +8,6 @@ import GameplayFeature from 'pages/features/GameplayFeature.vue';
 import CraftingFeature from 'pages/features/CraftingFeature.vue';
 import AssureFeature from 'pages/features/AssureFeature.vue';
 import SettingsFeature from 'pages/features/SettingsFeature.vue';
-import ChessboardSVG from 'src/components/ChessboardSVG.vue';
 
 export default [
   {
@@ -36,18 +35,13 @@ export default [
     component: LoginLayout,
   },
   {
-    path: '/:token_id/board.svg',
-    name: 'ChessboardSVG',
-    component: ChessboardSVG,
-  },
-  {
     path: '/:token_id',
     component: MainLayout,
     name: 'menuRoot',
     children: [
       {
         path: 'asset',
-        name: 'Asset',
+        name: 'Asset Details',
         icon: 'diamond',
         meta: { requiresAuth: false },
         component: AssetFeature,

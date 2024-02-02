@@ -1,9 +1,9 @@
 <template>
   <div v-if="asset?.imx?.metadata" class="q-pa-md">
-    <ChessboardComponent />
+    <ChessboardComponent :playable="false" :fen="asset.imx.metadata.FEN" />
 
     <div class="q-my-md text-center">
-      <div class="text-h5 q-my-md">{{ asset.imx.metadata.name }}</div>
+      <div class="text-h4 q-my-md">{{ asset.imx.metadata.name }}</div>
       <div class="text-subtitle2 q-my-md">{{ asset.imx.metadata.tagline }}</div>
 
       <q-list>
@@ -59,7 +59,7 @@
 import { onMounted, computed } from 'vue';
 import { useAssetStore } from 'src/stores/asset-store';
 import { useRoute } from 'vue-router';
-import ChessboardComponent from 'src/components/ChessboardSVG.vue';
+import ChessboardComponent from 'src/components/ChessboardComponent.vue';
 
 const asset = computed(() => assetStore);
 const token_id = computed(() => useRoute().params.token_id);

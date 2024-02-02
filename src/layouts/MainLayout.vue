@@ -1,5 +1,16 @@
 <template>
   <q-layout view="hHh lpR fFf">
+    <q-header elevated justify-between>
+      <q-toolbar v-if="asset.imx">
+        <q-avatar>
+          <img :src="asset.imx.collection.icon_url" />
+        </q-avatar>
+        <q-toolbar-title>
+          <span>{{ routeName }}</span>
+        </q-toolbar-title>
+      </q-toolbar>
+    </q-header>
+
     <!-- Page Container -->
     <q-page-container
       ><q-page class="q-pa-md"><router-view></router-view></q-page>
@@ -31,9 +42,12 @@ export default {
   setup() {
     const passport = usePassportStore();
     const assetStore = useAssetStore();
-    const token_id = computed(() => useRoute().params.token_id);
-    const accessibleRoutes = ref([]);
 
+    const route = useRoute();
+    const token_id = computed(() => route.params.token_id);
+    const routeName = computed(() => route.name);
+
+    const accessibleRoutes = ref([]);
     const updateAccessibleRoutes = () => {
       const menuRoutes = routes.find((route) => route.name === 'menuRoot');
       accessibleRoutes.value = passport.userProfile
@@ -53,6 +67,7 @@ export default {
     });
 
     return {
+      routeName,
       token_id,
       asset: computed(() => assetStore),
       accessibleRoutes,

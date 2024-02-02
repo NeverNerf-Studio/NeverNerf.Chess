@@ -1,8 +1,8 @@
 {
-  "name": "nevernerf-app",
+  "name": "nevernerf-chess",
   "version": "0.0.1",
   "description": "NeverNerf",
-  "productName": "NeverNerf_App",
+  "productName": "NeverNerf.Chess",
   "author": "sgr_nz",
   "private": true,
   "scripts": {

@@ -13,7 +13,7 @@
             <img :src="asset.imx.collection.icon_url" />
           </q-avatar>
           <q-toolbar-title>
-            <span>{{ asset.imx.metadata.name }}</span>
+            <span>Login</span>
           </q-toolbar-title>
         </q-toolbar>
       </q-header>
@@ -21,7 +21,9 @@
         <div v-if="asset.imx">
           <!-- Asset hero image -->
           <div class="fixed-full">
-            <ChessboardComponent />
+            <ChessboardComponent
+              :playable="false"
+              :fen="asset.imx.metadata.FEN" />
             <div class="absolute-bottom text-center">
               <span class="text-h5">
                 {{ asset.imx.metadata.name }}: {{ asset.imx.metadata.tagline }}
@@ -55,7 +57,7 @@ import { onMounted, computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useAssetStore } from 'src/stores/asset-store';
 import PassportLoginComponent from 'src/components/PassportLoginComponent.vue';
-import ChessboardComponent from 'src/components/ChessboardSVG.vue';
+import ChessboardComponent from 'src/components/ChessboardComponent.vue';
 
 export default {
   components: {
