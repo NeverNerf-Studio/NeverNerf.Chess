@@ -31,20 +31,20 @@ export default function (/* { store, ssrContext } */) {
     if (token_id !== from_token_id)
       await useAssetStore().loadMetadata(token_id);
 
-    if (process.env.DEV) {
-      console.group('Router.beforeEach debug:');
-      console.log('route to: ');
-      console.log(to);
-      console.log('route from: ');
-      console.log(from);
-      console.log('passport: ');
-      console.log(passport);
-      console.log('isAuthenticated: ' + isAuthenticated);
-      console.log('requiresAuth: ' + requiresAuth);
-      console.log('publicAltRoute: ' + publicAltRoute);
-      console.log('token_id: ' + token_id);
-      console.groupEnd();
-    }
+    // if (process.env.DEV) {
+    //   console.group('Router.beforeEach debug:');
+    //   console.log('route to: ');
+    //   console.log(to);
+    //   console.log('route from: ');
+    //   console.log(from);
+    //   console.log('passport: ');
+    //   console.log(passport);
+    //   console.log('isAuthenticated: ' + isAuthenticated);
+    //   console.log('requiresAuth: ' + requiresAuth);
+    //   console.log('publicAltRoute: ' + publicAltRoute);
+    //   console.log('token_id: ' + token_id);
+    //   console.groupEnd();
+    // }
 
     if (to.path == '/logout') next(`/${token_id}/asset`);
 

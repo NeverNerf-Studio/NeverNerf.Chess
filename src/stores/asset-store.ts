@@ -1,3 +1,4 @@
+import { md5 } from 'md5js';
 import { defineStore } from 'pinia';
 
 interface IMXMetadata {
@@ -12,7 +13,8 @@ interface IMXMetadata {
   image_url: string;
   metadata: {
     name: string;
-    FEN: string;
+    fen: string;
+    pgn: string;
     type: number;
     class: string;
     series: string;
@@ -36,17 +38,23 @@ interface IMXMetadata {
 }
 
 interface AssetState {
-  [key: string]: string; // or any, if the types of asset properties vary
+  [fenstring: string]: string; // or any, if the types of asset properties vary
+}
+
+interface TokenMap {
+  [fenString: string]: string; // Map FEN string to token_id
 }
 
 interface CollectionConfig {
   asset: Record<string, string>;
+  tokenMap: TokenMap;
 }
 
 export const useAssetStore = defineStore('asset', {
   state: () => ({
     imx: null as IMXMetadata | null,
     standardValues: {} as AssetState,
+    tokenMap: {} as TokenMap,
     loading: false, // Add a loading state
   }),
   actions: {
@@ -64,9 +72,9 @@ export const useAssetStore = defineStore('asset', {
       //   console.log(this.imx?.token_id);
       //   console.groupEnd();
       // }
-
-      if (this.imx && this.imx.token_id === token_id) {
-        //console.log('Data already loaded for this token:', token_id);
+      const current_token_id = this.imx?.token_id;
+      const current_collection_id = this.imx?.token_address;
+      if (this.imx && current_token_id === token_id) {
         return; // Avoid reloading if data is already present
       }
 
@@ -85,6 +93,10 @@ export const useAssetStore = defineStore('asset', {
         //Load asset configuration from collection metadata
         if (this.imx) {
           const collectionId = this.imx.token_address;
+          if (collectionId === current_collection_id) {
+            return; // Avoid reloading if data is already present
+          }
+
           const collectionConfigResponse = await fetch(
             `/imx_metadata/${collectionId}.json`
           );
@@ -94,9 +106,10 @@ export const useAssetStore = defineStore('asset', {
             );
           }
           const collectionConfig = await collectionConfigResponse.json();
-          console.log('Data loaded for collection:', collectionId);
-
+          this.tokenMap = collectionConfig.tokenMap || {};
           this.standardValues = this.setAssetProperties(collectionConfig);
+
+          console.log('Data loaded for collection:', collectionId);
         }
       } catch (error) {
         console.error('Error loading metadata:', error);
@@ -136,6 +149,10 @@ export const useAssetStore = defineStore('asset', {
       }
 
       return newAssetState;
+    },
+    getTokenIdByFen(fenString: string): string | undefined {
+      const fenStringHash = md5(fenString, 32).substring(0, 8);
+      return this.tokenMap[fenStringHash];
     },
   },
 });
