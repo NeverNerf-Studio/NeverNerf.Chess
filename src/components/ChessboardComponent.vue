@@ -11,6 +11,7 @@
             @click="selectPromotionPiece(piece)">
             <q-btn flat :label="pieceLabels[piece]" icon-size="2em">
               <img
+                style="background-color: #ecdab9; display: inline-block"
                 :src="`/chesspieces/wikipedia/${chess.turn()}${piece}.png`" />
             </q-btn>
           </div>
