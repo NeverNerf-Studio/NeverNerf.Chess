@@ -1,8 +1,7 @@
 
 #File1="ch/spec.txt"
 File1="package.json"
-File2="src/pages/features/GameplayFeature.vue"
-File3="src/components/ChessboardSVG.vue"
+File2="src/components/ChessboardComponent.vue"
 #File3="quasar.config.js"
 #File4="src/stores/passport-store.ts"
 #File5="src/components/LoginComponent.vue"
@@ -31,7 +30,7 @@ check_and_cat_file "$File2"
 check_and_cat_file "$File3"
 
 echo "\n\n##Task##"
-echo "Refactor GameplayFeature.vue to use cm-chessboard the same way ChessboardSVG.vue does."
+echo "<ASK Question>"
 
 echo "\n##Instructions##"
 echo "As a world class full stack Quasar developer:"

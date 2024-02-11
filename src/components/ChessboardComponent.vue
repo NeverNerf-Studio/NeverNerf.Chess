@@ -1,6 +1,22 @@
 <template>
   <div ref="boardElement"></div>
   <div v-if="playable">
+    <q-dialog v-model="promotionDialogVisible">
+      <q-card>
+        <div class="text-h6 text-center">Promotion</div>
+        <q-card-section class="row items-center justify-around">
+          <div
+            v-for="piece in promotionPieces"
+            :key="piece"
+            @click="selectPromotionPiece(piece)">
+            <q-btn flat :label="pieceLabels[piece]" icon-size="2em">
+              <img
+                :src="`/chesspieces/wikipedia/${chess.turn()}${piece}.png`" />
+            </q-btn>
+          </div>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
     <div>
       <q-item-section side>
         <q-btn
@@ -35,25 +51,19 @@ import 'cm-chessboard/assets/chessboard.css';
 import {
   INPUT_EVENT_TYPE,
   BORDER_TYPE,
-  COLOR,
   Chessboard,
 } from 'cm-chessboard/src/Chessboard.js';
 import {
   MARKER_TYPE,
   Markers,
 } from 'cm-chessboard/src/extensions/markers/Markers.js';
-import {
-  PROMOTION_DIALOG_RESULT_TYPE,
-  PromotionDialog,
-} from 'cm-chessboard/src/extensions/promotion-dialog/PromotionDialog.js';
-import { Accessibility } from 'cm-chessboard/src/extensions/accessibility/Accessibility.js';
 
 // Import chess.js, manages game state, legal moves etc.
 import { Chess } from 'chess.js';
 
 //vue imports
 import { ref, onMounted } from 'vue';
-import { reactive, computed } from 'vue';
+import { reactive, watch } from 'vue';
 
 // Define props
 const props = defineProps({
@@ -88,77 +98,6 @@ function updateGameState() {
   // Emit the updated gameState object to the parent component
   emit('gameStateUpdate', gameState);
 }
-
-// const currentFEN = computed(() => {
-//   gameStateChangeTracker.value;
-//   return chess.fen();
-// });
-// const currentPGN = computed(() => {
-//   gameStateChangeTracker.value;
-//   return chess.pgn();
-// });
-// const turn = computed(() => {
-//   gameStateChangeTracker.value;
-//   return chess.turn() === 'w' ? 'White' : 'Black';
-// });
-// const check = computed(() => {
-//   gameStateChangeTracker.value;
-//   return chess.isCheck();
-// });
-// const checkMate = computed(() => {
-//   gameStateChangeTracker.value;
-//   return chess.isCheckmate();
-// });
-
-const copyToClipboard = (text) => {
-  navigator.clipboard.writeText(text);
-};
-function generateMoves(chess, depth = 2, moveId = 1, history = []) {
-  if (depth === 0) return []; // Base case: no further recursion needed.
-
-  let movesList = [];
-  chess.moves().forEach((move) => {
-    const newChess = new Chess();
-    newChess.loadPgn(chess.pgn()); // Clone the current board.
-    newChess.move(move); // Make the move on the new board.
-
-    // Extend the history with the current move.
-    const newHistory = history.concat(move);
-
-    // Prepare the CSV row for this move.
-    const moveData = [
-      moveId++,
-      move, // The move made.
-      newChess.fen(), // FEN after the move.
-      `["${newHistory.join('","')}"]`, // PGN up to this move in CSV format.
-    ];
-
-    // Add the move data as a CSV row.
-    movesList.push(moveData.join(','));
-
-    // Generate child moves if depth allows and add them to the list.
-    if (depth > 1) {
-      movesList = movesList.concat(
-        generateMoves(newChess, depth - 1, moveId, newHistory)
-      );
-      moveId += newChess.moves().length; // Adjust moveId based on the number of moves generated.
-    }
-  });
-  return movesList;
-}
-const moveDumper = computed(() => {
-  gameStateChangeTracker.value;
-
-  console.log('Chess future moves: ' + chess.moves());
-  console.log('Chess pgn: ' + chess.pgn());
-
-  const movesList1 = generateMoves(chess, 1).join('\n');
-  console.log('Valid 1x moves: ' + movesList1.length);
-
-  const movesList2 = generateMoves(chess, 2).join('\n');
-  console.log('Valid 2x moves: ' + movesList2.length);
-  return movesList2;
-});
 
 // cm-chessboard inputhandler code
 // Main input handler function
@@ -203,18 +142,43 @@ function handleMoveStart(event) {
   return moves.length > 0;
 }
 
+const pieceLabels = {
+  q: 'Queen',
+  r: 'Rook',
+  b: 'Bishop',
+  n: 'Knight',
+};
+const promotionDialogVisible = ref(false);
+const promotionPieces = ['q', 'r', 'b', 'n']; // Queen, Rook, Bishop, Knight
+
+// Function to handle promotion piece selection
+const userPromotionChoice = ref(null);
+function selectPromotionPiece(piece) {
+  userPromotionChoice.value = piece;
+}
+// Modify the selectPromotionPiece to actually use the modal for selection
+function promptPromotionPiece() {
+  return new Promise((resolve) => {
+    promotionDialogVisible.value = true; // Show the dialog
+    const unwatch = watch(userPromotionChoice, (newValue) => {
+      if (newValue) {
+        resolve(newValue); // Resolve the promise with the selected piece
+        promotionDialogVisible.value = false; // Hide the dialog
+        userPromotionChoice.value = null; // Reset for next promotion
+        unwatch(); // Stop watching the variable
+      }
+    });
+  });
+}
+
 // Validates and executes a chess move, handling promotions as needed.
 function validateAndExecuteMove(event) {
   const move = {
     from: event.squareFrom,
     to: event.squareTo,
-    promotion: event.promotion,
   };
 
   try {
-    const result = chess.move(move);
-    if (!result) return false; // Move was not successful.
-
     // Check if promotion is needed and handle accordingly.
     const possibleMoves = chess.moves({
       square: event.squareFrom,
@@ -226,33 +190,42 @@ function validateAndExecuteMove(event) {
     );
 
     if (promotionMove) {
-      handlePromotion(event.squareTo, COLOR.white, event);
-      return true;
+      promptPromotionPiece()
+        .then((selectedOption) => {
+          const promotionMove = {
+            from: event.squareFrom,
+            to: event.squareTo,
+            promotion: selectedOption,
+          };
+          //Remove Pawn
+          board.value.setPiece(event.squareFrom, '', true);
+
+          //Add replacement
+          board.value.setPiece(
+            event.squareTo,
+            chess.turn() + selectedOption,
+            true
+          );
+
+          const validPromotion = chess.move(promotionMove);
+
+          removeMarkers(event.chessboard);
+          updateGameState();
+
+          return validPromotion;
+        })
+        .catch((error) => {
+          // Handle any error
+          console.log('An error occurred:', error);
+        });
+      return false; // Prevent the move until the piece is selected
     }
 
-    return result; // Return the result of the chess move.
+    return chess.move(move);
   } catch (error) {
     console.error(error);
     return false; // Indicate failure to process the move.
   }
-}
-
-// Handles chess piece promotion by showing a dialog for piece selection.
-function handlePromotion(squareTo, color, event) {
-  event.chessboard.showPromotionDialog(squareTo, color, (result) => {
-    if (result.type === PROMOTION_DIALOG_RESULT_TYPE.pieceSelected) {
-      chess.move({
-        from: event.squareFrom,
-        to: squareTo,
-        promotion: result.piece.charAt(0), // Assuming the piece type is the first character.
-      });
-      event.chessboard.setPosition(chess.fen(), true);
-    } else {
-      // Handle promotion cancellation.
-      event.chessboard.enableMoveInput(inputHandler, color);
-      event.chessboard.setPosition(chess.fen(), true);
-    }
-  });
 }
 
 onMounted(() => {
@@ -270,11 +243,10 @@ onMounted(() => {
     },
     extensions: [
       { class: Markers, props: { autoMarkers: MARKER_TYPE.square } },
-      { class: PromotionDialog },
-      { class: Accessibility, props: { visuallyHidden: true } },
     ],
     assetsUrl: 'node_modules/cm-chessboard/assets/',
   });
   board.value.enableMoveInput(inputHandler);
+  updateGameState();
 });
 </script>
