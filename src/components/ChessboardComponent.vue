@@ -1,5 +1,7 @@
 <template>
-  <div ref="boardElement"></div>
+  <div
+    :class="rarity ? `rarity ${rarity.toLowerCase()}` : ''"
+    ref="boardElement"></div>
   <div v-if="playable">
     <q-dialog v-model="promotionDialogVisible">
       <q-card>
@@ -44,20 +46,67 @@
     touch-action: none;
   }
 }
+
+/* Improved visibility, appealing, ensures good text contrast */
+.rarity.uncommon {
+  --primary-color: #4caf50; /* Brighter Green */
+  --secondary-color: #357a38; /* Richer Dark Green */
+  --stroke-width: 1px; /* Retain medium stroke */
+}
+
+/* Better color and contrast, stroke width refined for clarity */
+.rarity.rare {
+  --primary-color: #2196f3; /* Brighter Blue */
+  --secondary-color: #0b47a3; /* Deeper Dark Blue */
+  --stroke-width: 2px; /* Reduced stroke width */
+}
+
+/* Lighter purple for better contrast, adjusted stroke width */
+.rarity.epic {
+  --primary-color: #9c27b0; /* Lighter Purple */
+  --secondary-color: #6a1b9a; /* Adjusted Dark Purple for contrast */
+  --stroke-width: 2px; /* Reduced stroke width */
+}
+
+/* Adjusted gold colors for better visibility and contrast */
+.rarity.legendary {
+  --primary-color: #ffdf00; /* Brighter Gold */
+  --secondary-color: #c2a678; /* Lighter Dark Goldenrod, for contrast */
+  --stroke-width: 2px; /* Reduced stroke width */
+}
+
+/* Improved color scheme for uniqueness and contrast */
+.rarity.artifact {
+  --primary-color: #ba68c8; /* Adjusted Lavender to a more vivid shade */
+  --secondary-color: #9c27b0; /* Consistent with epic but darker for differentiation */
+  --stroke-width: 2px; /* Reduced stroke width */
+}
+
+.rarity .cm-chessboard.default.border-type-frame .board .border {
+  fill: var(--primary-color); /* Use the primary color variable */
+  stroke: var(--secondary-color); /* Use the secondary color variable */
+}
+
+.rarity .cm-chessboard.default .coordinates .coordinate {
+  fill: var(--secondary-color); /* Use the secondary color variable */
+  stroke: var(--secondary-color); /* Use the secondary color variable */
+  stroke-width: var(--stroke-width); /* Use the border width variable */
+}
+
+.cm-chessboard.default.border-type-frame .board .border-inner {
+  stroke: #000;
+}
 </style>
 
 <script setup>
 //cm-chessboard imports, manages gameboard and UI
 import 'cm-chessboard/assets/chessboard.css';
-import {
-  INPUT_EVENT_TYPE,
-  BORDER_TYPE,
-  Chessboard,
-} from 'cm-chessboard/src/Chessboard.js';
+import { INPUT_EVENT_TYPE, Chessboard } from 'cm-chessboard/src/Chessboard.js';
 import {
   MARKER_TYPE,
   Markers,
 } from 'cm-chessboard/src/extensions/markers/Markers.js';
+import { RarityBorder } from 'src/pages/features/gameplay/cm-chessboard/extensions/rarityBorder.js';
 
 // Import chess.js, manages game state, legal moves etc.
 import { Chess } from 'chess.js';
@@ -69,6 +118,7 @@ import { reactive, watch } from 'vue';
 // Define props
 const props = defineProps({
   playable: Boolean,
+  rarity: String,
   fen: String,
   pgn: String,
 });
@@ -85,6 +135,7 @@ const gameState = reactive({
   check: chess.isCheck(),
   checkMate: chess.isCheckmate(),
   moves: chess.moves(),
+  rarity: props.rarity,
 });
 
 const emit = defineEmits(['gameStateUpdate']);
@@ -231,19 +282,19 @@ function validateAndExecuteMove(event) {
 
 onMounted(() => {
   //Initialise game state
-  if (props.pgn) chess.loadPgn(props.pgn);
-  else chess.load(props.fen);
+  if (props.pgn && props.pgn != 'newgame') chess.loadPgn(props.pgn);
 
   //Initialise chessboard UI
   board.value = new Chessboard(boardElement.value, {
     position: chess.fen(),
     style: {
-      borderType: BORDER_TYPE.none,
       pieces: { file: 'pieces/staunty.svg' },
       animationDuration: 300,
+      borderType: 'frame',
     },
     extensions: [
       { class: Markers, props: { autoMarkers: MARKER_TYPE.square } },
+      { class: RarityBorder },
     ],
     assetsUrl: 'node_modules/cm-chessboard/assets/',
   });

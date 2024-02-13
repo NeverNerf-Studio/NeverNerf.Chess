@@ -15,6 +15,7 @@ interface IMXMetadata {
     name: string;
     fen: string;
     pgn: string;
+    rarity: string;
     type: number;
     class: string;
     series: string;
@@ -56,24 +57,41 @@ export const useAssetStore = defineStore('asset', {
     standardValues: {} as AssetState,
     tokenMap: {} as TokenMap,
     loading: false, // Add a loading state
+    collection_id: '' as string,
   }),
   actions: {
+    async loadCollection(collection_id: string) {
+      if (collection_id === this.collection_id) return; // Don't load collection data if already loaded
+      if (collection_id === '0') return; // Don't load collection data for 0
+
+      try {
+        const collectionConfigResponse = await fetch(
+          `/imx_metadata/${collection_id}.json`
+        );
+        if (!collectionConfigResponse.ok) {
+          throw new Error(
+            `Network response was not ok for collection: ${collection_id}`
+          );
+        }
+        const collectionConfig = await collectionConfigResponse.json();
+        this.tokenMap = collectionConfig.tokenMap || {};
+        this.standardValues = this.setAssetProperties(collectionConfig);
+        this.collection_id = collection_id;
+
+        console.log('Data loaded for collection:', collection_id);
+      } catch (error) {
+        console.error('Error loading collection:', error);
+      }
+    },
     async loadMetadata(token_id: string) {
+      if (token_id === '0') return; // Don't load metadata for the 0 token
+
       if (!token_id) {
         console.error('TokenID not provided');
         return;
       }
 
-      // if (process.env.DEV) {
-      //   console.group('AssetStore loadMetadata:');
-      //   console.log('token_id provided: ');
-      //   console.log(token_id);
-      //   console.log('token_id already loaded: ');
-      //   console.log(this.imx?.token_id);
-      //   console.groupEnd();
-      // }
       const current_token_id = this.imx?.token_id;
-      const current_collection_id = this.imx?.token_address;
       if (this.imx && current_token_id === token_id) {
         return; // Avoid reloading if data is already present
       }
@@ -89,28 +107,6 @@ export const useAssetStore = defineStore('asset', {
         }
         this.imx = await response.json();
         console.log('Data loaded for token:', token_id);
-
-        //Load asset configuration from collection metadata
-        if (this.imx) {
-          const collectionId = this.imx.token_address;
-          if (collectionId === current_collection_id) {
-            return; // Avoid reloading if data is already present
-          }
-
-          const collectionConfigResponse = await fetch(
-            `/imx_metadata/${collectionId}.json`
-          );
-          if (!collectionConfigResponse.ok) {
-            throw new Error(
-              `Network response was not ok for collection: ${collectionId}`
-            );
-          }
-          const collectionConfig = await collectionConfigResponse.json();
-          this.tokenMap = collectionConfig.tokenMap || {};
-          this.standardValues = this.setAssetProperties(collectionConfig);
-
-          console.log('Data loaded for collection:', collectionId);
-        }
       } catch (error) {
         console.error('Error loading metadata:', error);
         this.imx = null; // Only reset if this is intended on error

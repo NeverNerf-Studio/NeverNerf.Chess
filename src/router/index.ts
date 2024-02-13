@@ -5,7 +5,7 @@ import {
   createWebHashHistory,
 } from 'vue-router';
 import routes from './routes';
-import { usePassportStore } from 'src/stores/passport-store'; // Import Passport store
+//import { usePassportStore } from 'src/stores/passport-store'; // Import Passport store
 import { useAssetStore } from 'src/stores/asset-store'; // Import Asset store
 
 export default function (/* { store, ssrContext } */) {
@@ -22,13 +22,17 @@ export default function (/* { store, ssrContext } */) {
   });
 
   Router.beforeEach(async (to, from, next) => {
-    const passport = usePassportStore(); // Use the Passport store
-    const isAuthenticated = await passport.getUserInfo(); // Check if the user is authenticated
+    // const passport = usePassportStore(); // Use the Passport store
+    // const isAuthenticated = await passport.getUserInfo(); // Check if the user is authenticated
+    const isAuthenticated = false;
     const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
     const publicAltRoute = to.meta.publicAltRoute;
     const token_id = to.params.token_id as string;
     const from_token_id = from.params.token_id as string;
-    if (token_id !== from_token_id)
+
+    if (!useAssetStore().collection_id)
+      await useAssetStore().loadCollection('default');
+    if (token_id !== '0' && token_id !== from_token_id)
       await useAssetStore().loadMetadata(token_id);
 
     // if (process.env.DEV) {
