@@ -1,19 +1,36 @@
 <template>
-  <div v-if="assetPGN" class="q-pa-md">
+  <div v-if="!assetStore.loading" class="q-pa-md">
     <ChessboardComponent
       @gameStateUpdate="handleGameStateUpdate"
       :playable="true"
       :rarity="assetRarity"
       :pgn="assetPGN" />
-    <div class="text-center">
-      <h5>{{ assetName }}</h5>
+    <div class="game-state-container" :class="backgroundClass">
+      <img
+        v-if="gameState.check || gameState.checkMate"
+        :src="iconSrc"
+        class="state-icon" />
+      <h5 class="asset-name">{{ assetName }}</h5>
+      <img
+        v-if="gameState.check || gameState.checkMate"
+        :src="iconSrc"
+        class="state-icon" />
+      <div class="text-subtitle">
+        {{ assetDescription }}
+      </div>
     </div>
     <div style="padding-bottom: 20px">
-      <q-btn flat no-caps :to="`/1/gameplay`">
+      <q-btn flat no-caps color="blue" :to="`/1/gameplay?pgn=newgame`">
         <div class="text-center">New Game</div>
+        <q-tooltip class="primary">Start new game</q-tooltip>
       </q-btn>
-      <q-btn flat no-caps disable="true">
+      <q-btn flat no-caps disable>
         <div class="text-center">Invite</div>
+        <q-tooltip class="bg-negative">Coming Soon!</q-tooltip>
+      </q-btn>
+      <q-btn flat no-caps disable>
+        <div class="text-center">Mint</div>
+        <q-tooltip class="bg-negative">Coming Soon!</q-tooltip>
       </q-btn>
     </div>
     <div>
@@ -79,8 +96,51 @@
   </div>
 </template>
 
+<style>
+.game-state-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  margin-top: 5px;
+  border-radius: 10px; /* Rounded corners */
+  transition: all 0.3s ease; /* Smooth transition for background color */
+}
+
+.check-bg {
+  background-color: #ff8c00;
+  animation: pulseAnimation 1.5s infinite;
+}
+
+.checkmate-bg {
+  background-color: #fa0101;
+  animation: pulseAnimation 1.5s infinite;
+}
+
+@keyframes pulseAnimation {
+  0% {
+    box-shadow: 0 0 0 0px rgba(255, 255, 255, 0.2);
+  }
+  100% {
+    box-shadow: 0 0 0 15px rgba(255, 255, 255, 0);
+  }
+}
+
+.asset-name {
+  font-weight: bold;
+  margin: 0 10px;
+  font-size: 1.5em; /* Larger text */
+}
+
+.state-icon {
+  width: 24px; /* Adjust based on your icon size */
+  height: 24px; /* Adjust based on your icon size */
+  margin: 0 10px;
+}
+</style>
+
 <script setup>
-import { watch, ref, computed } from 'vue';
+import { ref, computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useAssetStore } from 'src/stores/asset-store';
 import ChessboardComponent from 'src/components/ChessboardComponent.vue';
@@ -93,21 +153,41 @@ const token_id = computed(() => useRoute().params.token_id);
 const queryStringPgn = computed(() => useRoute().query.pgn);
 
 const previousAssetName = ref('New Game');
-watch(
-  () => useAssetStore().imx?.metadata.name,
-  (newName) => {
-    //Persist past assetName
-    if (previousAssetName.value != newName) {
-      previousAssetName.value = newName;
-    }
-  }
-);
-
 const assetName = computed(() => {
   if (token_id.value == '0') {
     return `Child of ${previousAssetName.value}`;
   } else {
-    return useAssetStore().imx.metadata.name;
+    return useAssetStore().imx.name;
+  }
+});
+
+const backgroundClass = computed(() => {
+  if (gameState.value) {
+    return gameState.value.checkMate
+      ? 'checkmate-bg'
+      : gameState.value.check
+      ? 'check-bg'
+      : '';
+  }
+  return '';
+});
+
+const iconSrc = computed(() => {
+  if (gameState.value) {
+    const pieceColor = gameState.value.turn.substr(0, 1).toLowerCase();
+    const kingPiece = `/chesspieces/wikipedia/${pieceColor}K.png`;
+    return kingPiece;
+  }
+  return '';
+});
+
+const assetDescription = computed(() => {
+  if (gameState.value.checkMate) return 'Checkmate';
+  if (gameState.value.check) return 'Check';
+  if (token_id.value == '0') {
+    return 'Striking off in unexplored territory';
+  } else {
+    return useAssetStore().imx.description;
   }
 });
 
@@ -132,6 +212,7 @@ const copyToClipboard = (text) => {
 };
 
 function handleGameStateUpdate(newGameState) {
+  if (token_id.value != '0') previousAssetName.value = useAssetStore().imx.name;
   gameState.value = newGameState;
   const tokenExists = assetStore.getTokenIdByFen(newGameState.fen);
   if (tokenExists) {

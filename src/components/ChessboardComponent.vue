@@ -20,17 +20,6 @@
         </q-card-section>
       </q-card>
     </q-dialog>
-    <div>
-      <q-item-section side>
-        <q-btn
-          icon="content_copy"
-          @click="copyToClipboard(moveDumper)"
-          flat
-          dense
-          >Future moves</q-btn
-        >
-      </q-item-section>
-    </div>
   </div>
 </template>
 
@@ -47,39 +36,35 @@
   }
 }
 
-/* Improved visibility, appealing, ensures good text contrast */
+.rarity.common {
+  --primary-color: #bababa;
+  --secondary-color: #ffffff;
+}
+
 .rarity.uncommon {
-  --primary-color: #4caf50; /* Brighter Green */
-  --secondary-color: #357a38; /* Richer Dark Green */
-  --stroke-width: 1px; /* Retain medium stroke */
+  --primary-color: #4caf50;
+  --secondary-color: #357a38;
 }
 
-/* Better color and contrast, stroke width refined for clarity */
 .rarity.rare {
-  --primary-color: #2196f3; /* Brighter Blue */
-  --secondary-color: #0b47a3; /* Deeper Dark Blue */
-  --stroke-width: 2px; /* Reduced stroke width */
+  --primary-color: #2196f3;
+  /* --secondary-color: #0b47a3; */
+  --secondary-color: url(#diamondGradient);
 }
 
-/* Lighter purple for better contrast, adjusted stroke width */
 .rarity.epic {
-  --primary-color: #9c27b0; /* Lighter Purple */
-  --secondary-color: #6a1b9a; /* Adjusted Dark Purple for contrast */
-  --stroke-width: 2px; /* Reduced stroke width */
+  --primary-color: #732888;
+  --secondary-color: url(#diamondGradient);
 }
 
-/* Adjusted gold colors for better visibility and contrast */
 .rarity.legendary {
-  --primary-color: #ffdf00; /* Brighter Gold */
-  --secondary-color: #c2a678; /* Lighter Dark Goldenrod, for contrast */
-  --stroke-width: 2px; /* Reduced stroke width */
+  --primary-color: #000;
+  --secondary-color: url(#silverGradient);
 }
 
-/* Improved color scheme for uniqueness and contrast */
 .rarity.artifact {
-  --primary-color: #ba68c8; /* Adjusted Lavender to a more vivid shade */
-  --secondary-color: #9c27b0; /* Consistent with epic but darker for differentiation */
-  --stroke-width: 2px; /* Reduced stroke width */
+  --primary-color: url(#richMahogany);
+  --secondary-color: url(#goldGradient);
 }
 
 .rarity .cm-chessboard.default.border-type-frame .board .border {
@@ -90,7 +75,6 @@
 .rarity .cm-chessboard.default .coordinates .coordinate {
   fill: var(--secondary-color); /* Use the secondary color variable */
   stroke: var(--secondary-color); /* Use the secondary color variable */
-  stroke-width: var(--stroke-width); /* Use the border width variable */
 }
 
 .cm-chessboard.default.border-type-frame .board .border-inner {

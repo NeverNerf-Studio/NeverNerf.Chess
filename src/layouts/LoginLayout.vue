@@ -10,7 +10,7 @@
       <q-header elevated justify-between>
         <q-toolbar v-if="asset.imx">
           <q-avatar>
-            <img :src="asset.imx.collection.icon_url" />
+            <img :src="asset.collection_icon_url" />
           </q-avatar>
           <q-toolbar-title>
             <span>Login</span>

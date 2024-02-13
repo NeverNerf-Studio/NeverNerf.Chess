@@ -30,10 +30,6 @@ interface IMXMetadata {
     specialEditionStr: string;
     animation_url_mime_type: string;
   };
-  collection: {
-    name: string;
-    icon_url: string;
-  };
   created_at: string;
   updated_at: string;
 }
@@ -47,7 +43,7 @@ interface TokenMap {
 }
 
 interface CollectionConfig {
-  asset: Record<string, string>;
+  assetConfig: Record<string, string>;
   tokenMap: TokenMap;
 }
 
@@ -58,6 +54,8 @@ export const useAssetStore = defineStore('asset', {
     tokenMap: {} as TokenMap,
     loading: false, // Add a loading state
     collection_id: '' as string,
+    collection_name: '' as string,
+    collection_icon_url: '' as string,
   }),
   actions: {
     async loadCollection(collection_id: string) {
@@ -76,7 +74,9 @@ export const useAssetStore = defineStore('asset', {
         const collectionConfig = await collectionConfigResponse.json();
         this.tokenMap = collectionConfig.tokenMap || {};
         this.standardValues = this.setAssetProperties(collectionConfig);
-        this.collection_id = collection_id;
+        this.collection_id = collectionConfig.collection.id;
+        this.collection_name = collectionConfig.collection.name;
+        this.collection_icon_url = collectionConfig.collection.icon_url;
 
         console.log('Data loaded for collection:', collection_id);
       } catch (error) {
@@ -106,7 +106,6 @@ export const useAssetStore = defineStore('asset', {
           throw new Error(`Network response was not ok for token: ${token_id}`);
         }
         this.imx = await response.json();
-        console.log('Data loaded for token:', token_id);
       } catch (error) {
         console.error('Error loading metadata:', error);
         this.imx = null; // Only reset if this is intended on error
@@ -117,7 +116,7 @@ export const useAssetStore = defineStore('asset', {
     setAssetProperties(collectionConfig: CollectionConfig): AssetState {
       const newAssetState: AssetState = {};
 
-      for (const [key, value] of Object.entries(collectionConfig.asset)) {
+      for (const [key, value] of Object.entries(collectionConfig.assetConfig)) {
         const path = value.split('.');
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         let currentContext: any = this.imx; // Type assertion to any
