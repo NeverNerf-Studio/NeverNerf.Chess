@@ -1,26 +1,22 @@
 <template>
   <div v-if="!assetStore.loading" class="q-pa-md">
-    <ChessboardComponent
-      @gameStateUpdate="handleGameStateUpdate"
-      :playable="true"
-      :rarity="assetRarity"
-      :pgn="assetPGN" />
+    <ChessboardComponent :playable="true" :rarity="assetRarity" />
     <div class="game-state-container" :class="backgroundClass">
       <img
-        v-if="gameState.check || gameState.checkMate"
-        :src="iconSrc"
+        v-if="chessboardStore.check || chessboardStore.checkMate"
+        :src="kingPieceIconSrc"
         class="state-icon" />
       <h5 class="asset-name">{{ assetName }}</h5>
       <img
-        v-if="gameState.check || gameState.checkMate"
-        :src="iconSrc"
+        v-if="chessboardStore.check || chessboardStore.checkMate"
+        :src="kingPieceIconSrc"
         class="state-icon" />
       <div class="text-subtitle">
         {{ assetDescription }}
       </div>
     </div>
     <div style="padding-bottom: 20px">
-      <q-btn flat no-caps color="blue" :to="`/1/gameplay?pgn=newgame`">
+      <q-btn flat no-caps color="blue" @click="handleNewGame">
         <div class="text-center">New Game</div>
         <q-tooltip class="primary">Start new game</q-tooltip>
       </q-btn>
@@ -35,31 +31,34 @@
     </div>
     <div>
       <q-item class="q-py-xs">
-        <q-item-section> <b>Turn: </b> {{ gameState.turn }}</q-item-section>
+        <q-item-section>
+          <b>Turn: </b> {{ chessboardStore.turn }}</q-item-section
+        >
         <q-item-section side>
           <q-btn
             icon="content_copy"
-            @click="copyToClipboard(gameState.turn)"
+            @click="copyToClipboard(chessboardStore.turn)"
             flat
             dense></q-btn> </q-item-section
       ></q-item>
       <q-item class="q-py-xs">
         <q-item-section>
-          <b>fen: </b> {{ gameState.fen?.substr(0, 32) }}...</q-item-section
+          <b>fen: </b>
+          {{ chessboardStore.fen?.substr(0, 32) }}...</q-item-section
         >
         <q-item-section side>
           <q-btn
             icon="content_copy"
-            @click="copyToClipboard(gameState.fen)"
+            @click="copyToClipboard(chessboardStore.fen)"
             flat
             dense></q-btn> </q-item-section
       ></q-item>
       <q-item class="q-py-xs">
-        <q-item-section> <b>pgn: </b> {{ gameState.pgn }}</q-item-section>
+        <q-item-section> <b>pgn: </b> {{ chessboardStore.pgn }}</q-item-section>
         <q-item-section side>
           <q-btn
             icon="content_copy"
-            @click="copyToClipboard(gameState.pgn)"
+            @click="copyToClipboard(chessboardStore.pgn)"
             flat
             dense></q-btn> </q-item-section
       ></q-item>
@@ -73,22 +72,24 @@
             dense></q-btn> </q-item-section
       ></q-item>
       <q-item class="q-py-xs">
-        <q-item-section> <b>Check: </b> {{ gameState.check }}</q-item-section>
+        <q-item-section>
+          <b>Check: </b> {{ chessboardStore.check }}</q-item-section
+        >
         <q-item-section side>
           <q-btn
             icon="content_copy"
-            @click="copyToClipboard(gameState.check)"
+            @click="copyToClipboard(chessboardStore.check)"
             flat
             dense></q-btn> </q-item-section
       ></q-item>
       <q-item class="q-py-xs">
         <q-item-section>
-          <b>Checkmate: </b> {{ gameState.checkMate }}</q-item-section
+          <b>Checkmate: </b> {{ chessboardStore.checkMate }}</q-item-section
         >
         <q-item-section side>
           <q-btn
             icon="content_copy"
-            @click="copyToClipboard(gameState.checkMate)"
+            @click="copyToClipboard(chessboardStore.checkMate)"
             flat
             dense></q-btn> </q-item-section
       ></q-item>
@@ -140,17 +141,17 @@
 </style>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { watch, ref, computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useAssetStore } from 'src/stores/asset-store';
 import ChessboardComponent from 'src/components/ChessboardComponent.vue';
+import { useChessboardStore } from 'src/stores/chessboard-store';
 
 const assetStore = useAssetStore();
+const chessboardStore = useChessboardStore();
 const router = useRouter();
-const gameState = ref({});
 
 const token_id = computed(() => useRoute().params.token_id);
-const queryStringPgn = computed(() => useRoute().query.pgn);
 
 const previousAssetName = ref('New Game');
 const assetName = computed(() => {
@@ -162,28 +163,22 @@ const assetName = computed(() => {
 });
 
 const backgroundClass = computed(() => {
-  if (gameState.value) {
-    return gameState.value.checkMate
-      ? 'checkmate-bg'
-      : gameState.value.check
-      ? 'check-bg'
-      : '';
-  }
-  return '';
+  return chessboardStore.checkMate
+    ? 'checkmate-bg'
+    : chessboardStore.check
+    ? 'check-bg'
+    : '';
 });
 
-const iconSrc = computed(() => {
-  if (gameState.value) {
-    const pieceColor = gameState.value.turn.substr(0, 1).toLowerCase();
-    const kingPiece = `/chesspieces/wikipedia/${pieceColor}K.png`;
-    return kingPiece;
-  }
-  return '';
+const kingPieceIconSrc = computed(() => {
+  const pieceColor = chessboardStore.turn;
+  const kingPiece = `/chesspieces/wikipedia/${pieceColor}K.png`;
+  return kingPiece;
 });
 
 const assetDescription = computed(() => {
-  if (gameState.value.checkMate) return 'Checkmate';
-  if (gameState.value.check) return 'Check';
+  if (chessboardStore.checkMate) return 'Checkmate';
+  if (chessboardStore.check) return 'Check';
   if (token_id.value == '0') {
     return 'Striking off in unexplored territory';
   } else {
@@ -191,16 +186,8 @@ const assetDescription = computed(() => {
   }
 });
 
-const assetPGN = computed(() => {
-  if (token_id.value == 0) {
-    return queryStringPgn.value || 'newgame';
-  } else {
-    return assetStore.imx.metadata.pgn;
-  }
-});
-
 const assetRarity = computed(() => {
-  if (token_id.value == 0) {
+  if (token_id.value === '0') {
     return 'Common';
   } else {
     return assetStore.imx.metadata.rarity;
@@ -211,14 +198,21 @@ const copyToClipboard = (text) => {
   navigator.clipboard.writeText(text);
 };
 
-function handleGameStateUpdate(newGameState) {
-  if (token_id.value != '0') previousAssetName.value = useAssetStore().imx.name;
-  gameState.value = newGameState;
-  const tokenExists = assetStore.getTokenIdByFen(newGameState.fen);
-  if (tokenExists) {
-    router.push(`/${tokenExists}/gameplay?pgn=${newGameState.pgn}`);
-  } else {
-    router.push(`/0/gameplay?pgn=${newGameState.pgn}`);
+const handleNewGame = () => {
+  chessboardStore.updateGameFromPGN('newgame');
+};
+
+// Reactive watch on the chessboard store's state
+watch(
+  () => chessboardStore.fen,
+  () => {
+    if (token_id.value != '0') previousAssetName.value = assetStore.imx.name;
+    const tokenExists = assetStore.getTokenIdByFen(chessboardStore.fen);
+    if (tokenExists) {
+      router.push(`/${tokenExists}/gameplay?pgn=${chessboardStore.pgn}`);
+    } else {
+      router.push(`/0/gameplay?pgn=${chessboardStore.pgn}`);
+    }
   }
-}
+);
 </script>

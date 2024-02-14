@@ -52,13 +52,14 @@ export const useAssetStore = defineStore('asset', {
     imx: null as IMXMetadata | null,
     standardValues: {} as AssetState,
     tokenMap: {} as TokenMap,
-    loading: false, // Add a loading state
+    loading: true, // Add a loading state
     collection_id: '' as string,
     collection_name: '' as string,
     collection_icon_url: '' as string,
   }),
   actions: {
     async loadCollection(collection_id: string) {
+      this.loading = true;
       if (collection_id === this.collection_id) return; // Don't load collection data if already loaded
       if (collection_id === '0') return; // Don't load collection data for 0
 
@@ -82,21 +83,26 @@ export const useAssetStore = defineStore('asset', {
       } catch (error) {
         console.error('Error loading collection:', error);
       }
+      this.loading = false;
     },
     async loadMetadata(token_id: string) {
-      if (token_id === '0') return; // Don't load metadata for the 0 token
+      this.loading = true;
+      if (token_id === '0') {
+        this.loading = false;
+        return; // Don't load metadata for the 0 token
+      }
 
       if (!token_id) {
+        this.loading = false;
         console.error('TokenID not provided');
         return;
       }
 
       const current_token_id = this.imx?.token_id;
       if (this.imx && current_token_id === token_id) {
+        this.loading = false;
         return; // Avoid reloading if data is already present
       }
-
-      this.loading = true;
       try {
         //Load token metadata
         const response = await fetch(
@@ -109,9 +115,8 @@ export const useAssetStore = defineStore('asset', {
       } catch (error) {
         console.error('Error loading metadata:', error);
         this.imx = null; // Only reset if this is intended on error
-      } finally {
-        this.loading = false;
       }
+      this.loading = false;
     },
     setAssetProperties(collectionConfig: CollectionConfig): AssetState {
       const newAssetState: AssetState = {};

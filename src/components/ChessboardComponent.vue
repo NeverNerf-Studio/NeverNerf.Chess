@@ -1,6 +1,6 @@
 <template>
   <div
-    :class="rarity ? `rarity ${rarity.toLowerCase()}` : ''"
+    :class="rarity ? `rarity ${props.rarity.toLowerCase()}` : ''"
     ref="boardElement"></div>
   <div v-if="playable">
     <q-dialog v-model="promotionDialogVisible">
@@ -14,7 +14,7 @@
             <q-btn flat :label="pieceLabels[piece]" icon-size="2em">
               <img
                 style="background-color: #ecdab9; display: inline-block"
-                :src="`/chesspieces/wikipedia/${chess.turn()}${piece}.png`" />
+                :src="`/chesspieces/wikipedia/${chessboardStore.turn}${piece}.png`" />
             </q-btn>
           </div>
         </q-card-section>
@@ -36,47 +36,6 @@
   }
 }
 
-.rarity.common {
-  --primary-color: #bababa;
-  --secondary-color: #ffffff;
-}
-
-.rarity.uncommon {
-  --primary-color: #4caf50;
-  --secondary-color: #357a38;
-}
-
-.rarity.rare {
-  --primary-color: #2196f3;
-  /* --secondary-color: #0b47a3; */
-  --secondary-color: url(#diamondGradient);
-}
-
-.rarity.epic {
-  --primary-color: #732888;
-  --secondary-color: url(#diamondGradient);
-}
-
-.rarity.legendary {
-  --primary-color: #000;
-  --secondary-color: url(#silverGradient);
-}
-
-.rarity.artifact {
-  --primary-color: url(#richMahogany);
-  --secondary-color: url(#goldGradient);
-}
-
-.rarity .cm-chessboard.default.border-type-frame .board .border {
-  fill: var(--primary-color); /* Use the primary color variable */
-  stroke: var(--secondary-color); /* Use the secondary color variable */
-}
-
-.rarity .cm-chessboard.default .coordinates .coordinate {
-  fill: var(--secondary-color); /* Use the secondary color variable */
-  stroke: var(--secondary-color); /* Use the secondary color variable */
-}
-
 .cm-chessboard.default.border-type-frame .board .border-inner {
   stroke: #000;
 }
@@ -85,19 +44,18 @@
 <script setup>
 //cm-chessboard imports, manages gameboard and UI
 import 'cm-chessboard/assets/chessboard.css';
-import { INPUT_EVENT_TYPE, Chessboard } from 'cm-chessboard/src/Chessboard.js';
+import { Chessboard } from 'cm-chessboard/src/Chessboard.js';
 import {
   MARKER_TYPE,
   Markers,
 } from 'cm-chessboard/src/extensions/markers/Markers.js';
 import { RarityBorder } from 'src/pages/features/gameplay/cm-chessboard/extensions/rarityBorder.js';
-
-// Import chess.js, manages game state, legal moves etc.
-import { Chess } from 'chess.js';
+import { useChessboardStore } from 'src/stores/chessboard-store';
+import { createInputHandler } from 'src/pages/features/gameplay/cm-chessboard/chessboardInputHandler.js';
 
 //vue imports
 import { ref, onMounted } from 'vue';
-import { reactive, watch } from 'vue';
+import { watch } from 'vue';
 
 // Define props
 const props = defineProps({
@@ -107,170 +65,40 @@ const props = defineProps({
   pgn: String,
 });
 
-const boardElement = ref(null); // This is the container tag for the board
-const board = ref(null); // This will hold the chessboard object
-const chess = new Chess(); // This will hold the chess game logic
+// This is the container tag for the board
+const boardElement = ref(null);
 
-// Define the reactive state object
-const gameState = reactive({
-  fen: chess.fen(),
-  pgn: chess.pgn(),
-  turn: chess.turn() === 'w' ? 'White' : 'Black',
-  check: chess.isCheck(),
-  checkMate: chess.isCheckmate(),
-  moves: chess.moves(),
-  rarity: props.rarity,
-});
+// Contains chess gamestate in pinia store
+const chessboardStore = useChessboardStore();
 
-const emit = defineEmits(['gameStateUpdate']);
-function updateGameState() {
-  gameState.fen = chess.fen();
-  gameState.pgn = chess.pgn();
-  gameState.turn = chess.turn() === 'w' ? 'White' : 'Black';
-  gameState.check = chess.isCheck();
-  gameState.checkMate = chess.isCheckmate();
-  gameState.moves = chess.moves();
-
-  // Emit the updated gameState object to the parent component
-  emit('gameStateUpdate', gameState);
-}
-
-// cm-chessboard inputhandler code
-// Main input handler function
-function inputHandler(event) {
-  switch (event.type) {
-    case INPUT_EVENT_TYPE.movingOverSquare:
-      // Ignored event type, no operation required.
-      break;
-    case INPUT_EVENT_TYPE.moveInputStarted:
-      return handleMoveStart(event);
-    case INPUT_EVENT_TYPE.validateMoveInput:
-      return validateAndExecuteMove(event);
-    case INPUT_EVENT_TYPE.moveInputFinished:
-      removeMarkers(event.chessboard);
-      updateGameState();
-      break;
-    default:
-      removeMarkers(event.chessboard);
-      break;
+// Function to handle promotion piece selection
+function selectPromotionPiece(piece) {
+  if (chessboardStore.promotionMove) {
+    chessboardStore.promotionMove.promotion = piece;
+    chessboardStore.makeMove(chessboardStore.promotionMove);
+    promotionDialogVisible.value = false; // Close the dialog after selection
   }
 }
-
-// Removes all markers from the chessboard.
-function removeMarkers(chessboard) {
-  chessboard.removeMarkers(MARKER_TYPE.dot);
-  chessboard.removeMarkers(MARKER_TYPE.bevel);
-}
-
-// Handles the start of a move input, adding markers to possible destination squares.
-function handleMoveStart(event) {
-  removeMarkers(event.chessboard); // Clear existing markers.
-
-  const moves = chess.moves({ square: event.squareFrom, verbose: true });
-  moves.forEach((move) => {
-    if (event.chessboard.getPiece(move.to)) {
-      event.chessboard.addMarker(MARKER_TYPE.bevel, move.to);
-    } else {
-      event.chessboard.addMarker(MARKER_TYPE.dot, move.to);
-    }
-  });
-
-  return moves.length > 0;
-}
-
 const pieceLabels = {
   q: 'Queen',
   r: 'Rook',
   b: 'Bishop',
   n: 'Knight',
 };
-const promotionDialogVisible = ref(false);
 const promotionPieces = ['q', 'r', 'b', 'n']; // Queen, Rook, Bishop, Knight
 
-// Function to handle promotion piece selection
-const userPromotionChoice = ref(null);
-function selectPromotionPiece(piece) {
-  userPromotionChoice.value = piece;
-}
-// Modify the selectPromotionPiece to actually use the modal for selection
-function promptPromotionPiece() {
-  return new Promise((resolve) => {
-    promotionDialogVisible.value = true; // Show the dialog
-    const unwatch = watch(userPromotionChoice, (newValue) => {
-      if (newValue) {
-        resolve(newValue); // Resolve the promise with the selected piece
-        promotionDialogVisible.value = false; // Hide the dialog
-        userPromotionChoice.value = null; // Reset for next promotion
-        unwatch(); // Stop watching the variable
-      }
-    });
-  });
-}
-
-// Validates and executes a chess move, handling promotions as needed.
-function validateAndExecuteMove(event) {
-  const move = {
-    from: event.squareFrom,
-    to: event.squareTo,
-  };
-
-  try {
-    // Check if promotion is needed and handle accordingly.
-    const possibleMoves = chess.moves({
-      square: event.squareFrom,
-      verbose: true,
-    });
-    const promotionMove = possibleMoves.find(
-      (possibleMove) =>
-        possibleMove.promotion && possibleMove.to === event.squareTo
-    );
-
-    if (promotionMove) {
-      promptPromotionPiece()
-        .then((selectedOption) => {
-          const promotionMove = {
-            from: event.squareFrom,
-            to: event.squareTo,
-            promotion: selectedOption,
-          };
-          //Remove Pawn
-          board.value.setPiece(event.squareFrom, '', true);
-
-          //Add replacement
-          board.value.setPiece(
-            event.squareTo,
-            chess.turn() + selectedOption,
-            true
-          );
-
-          const validPromotion = chess.move(promotionMove);
-
-          removeMarkers(event.chessboard);
-          updateGameState();
-
-          return validPromotion;
-        })
-        .catch((error) => {
-          // Handle any error
-          console.log('An error occurred:', error);
-        });
-      return false; // Prevent the move until the piece is selected
-    }
-
-    return chess.move(move);
-  } catch (error) {
-    console.error(error);
-    return false; // Indicate failure to process the move.
+const promotionDialogVisible = ref(false);
+watch(
+  () => chessboardStore.promotionMove,
+  () => {
+    promotionDialogVisible.value = true;
   }
-}
+);
 
 onMounted(() => {
-  //Initialise game state
-  if (props.pgn && props.pgn != 'newgame') chess.loadPgn(props.pgn);
-
-  //Initialise chessboard UI
-  board.value = new Chessboard(boardElement.value, {
-    position: chess.fen(),
+  // Initialize chessboard UI
+  const board = new Chessboard(boardElement.value, {
+    position: chessboardStore.fen,
     style: {
       pieces: { file: 'pieces/staunty.svg' },
       animationDuration: 300,
@@ -282,7 +110,8 @@ onMounted(() => {
     ],
     assetsUrl: 'node_modules/cm-chessboard/assets/',
   });
-  board.value.enableMoveInput(inputHandler);
-  updateGameState();
+
+  // Use chessboardInputHandler.createInputHandler for handling user input
+  board.enableMoveInput(createInputHandler(chessboardStore));
 });
 </script>

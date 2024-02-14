@@ -1,0 +1,45 @@
+.rarity {
+  &.common {
+    --primary-color: #bababa;
+    --secondary-color: #ffffff;
+  }
+
+  &.uncommon {
+    --primary-color: #4caf50;
+    --secondary-color: #357a38;
+  }
+
+  &.rare {
+    --primary-color: #2196f3;
+    --secondary-color: url(#diamondGradient);
+  }
+
+  &.epic {
+    --primary-color: #732888;
+    --secondary-color: url(#diamondGradient);
+  }
+
+  &.legendary {
+    --primary-color: #000;
+    --secondary-color: url(#silverGradient);
+  }
+
+  &.artifact {
+    --primary-color: url(#richMahogany);
+    --secondary-color: url(#goldGradient);
+  }
+
+  .cm-chessboard {
+    &.default {
+      &.border-type-frame .board .border {
+        fill: var(--primary-color);
+        stroke: var(--secondary-color);
+      }
+
+      .coordinates .coordinate {
+        fill: var(--secondary-color);
+        stroke: var(--secondary-color);
+      }
+    }
+  }
+}
