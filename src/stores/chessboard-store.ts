@@ -13,9 +13,6 @@ export const useChessboardStore = defineStore('chessboard', {
     promotionMove: null as { from: string; to: string } | null,
   }),
   actions: {
-    init() {
-      this.syncGameState();
-    },
     updateGameFromFen(fen: string) {
       try {
         this.chess.load(fen);

@@ -141,7 +141,7 @@
 </style>
 
 <script setup>
-import { watch, ref, computed } from 'vue';
+import { onMounted, watch, ref, computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useAssetStore } from 'src/stores/asset-store';
 import ChessboardComponent from 'src/components/ChessboardComponent.vue';
@@ -201,6 +201,18 @@ const copyToClipboard = (text) => {
 const handleNewGame = () => {
   chessboardStore.updateGameFromPGN('newgame');
 };
+
+const queryStringPgn = computed(() => useRoute().query.pgn);
+onMounted(() => {
+  // If we're on a token then load that as PGN
+  if (token_id.value !== '0' && chessboardStore.pgn === '') {
+    chessboardStore.updateGameFromPGN(assetStore.imx?.metadata.pgn);
+  }
+  //Otherwise load from the query string pgn
+  else if (!chessboardStore.pgn && queryStringPgn.value) {
+    chessboardStore.updateGameFromPGN(queryStringPgn.value);
+  }
+});
 
 // Reactive watch on the chessboard store's state
 watch(

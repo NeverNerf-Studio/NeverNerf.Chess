@@ -31,7 +31,7 @@ export default function (/* { store, ssrContext } */) {
     const token_id = to.params.token_id as string;
     const from_token_id = from.params.token_id as string;
 
-    if (!useChessboardStore().fen) useChessboardStore().init();
+    if (!useChessboardStore().fen) useChessboardStore().syncGameState();
     if (!useAssetStore().collection_id)
       await useAssetStore().loadCollection('default');
     if (token_id !== '0' && token_id !== from_token_id)

@@ -71,14 +71,6 @@ const boardElement = ref(null);
 // Contains chess gamestate in pinia store
 const chessboardStore = useChessboardStore();
 
-// Function to handle promotion piece selection
-function selectPromotionPiece(piece) {
-  if (chessboardStore.promotionMove) {
-    chessboardStore.promotionMove.promotion = piece;
-    chessboardStore.makeMove(chessboardStore.promotionMove);
-    promotionDialogVisible.value = false; // Close the dialog after selection
-  }
-}
 const pieceLabels = {
   q: 'Queen',
   r: 'Rook',
@@ -87,6 +79,7 @@ const pieceLabels = {
 };
 const promotionPieces = ['q', 'r', 'b', 'n']; // Queen, Rook, Bishop, Knight
 
+// Toggle
 const promotionDialogVisible = ref(false);
 watch(
   () => chessboardStore.promotionMove,
@@ -94,10 +87,31 @@ watch(
     promotionDialogVisible.value = true;
   }
 );
+// Function to handle promotion piece selection
+function selectPromotionPiece(piece) {
+  if (chessboardStore.promotionMove) {
+    chessboardStore.promotionMove.promotion = piece;
+    chessboardStore.makeMove(chessboardStore.promotionMove);
+    promotionDialogVisible.value = false; // Close the dialog after selection
+  }
+}
+
+const board = ref(null);
+watch(
+  () => chessboardStore.pgn,
+  () => {
+    if (board.value) {
+      board.value.setPosition(chessboardStore.fen);
+    }
+  },
+  {
+    immediate: false,
+  }
+);
 
 onMounted(() => {
   // Initialize chessboard UI
-  const board = new Chessboard(boardElement.value, {
+  board.value = new Chessboard(boardElement.value, {
     position: chessboardStore.fen,
     style: {
       pieces: { file: 'pieces/staunty.svg' },
@@ -112,6 +126,6 @@ onMounted(() => {
   });
 
   // Use chessboardInputHandler.createInputHandler for handling user input
-  board.enableMoveInput(createInputHandler(chessboardStore));
+  board.value.enableMoveInput(createInputHandler(chessboardStore));
 });
 </script>
