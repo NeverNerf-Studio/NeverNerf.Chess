@@ -112,7 +112,7 @@ watch(
 onMounted(() => {
   // Initialize chessboard UI
   board.value = new Chessboard(boardElement.value, {
-    position: chessboardStore.fen,
+    position: props.playable ? chessboardStore.fen : props.fen,
     style: {
       pieces: { file: 'pieces/staunty.svg' },
       animationDuration: 300,
@@ -126,6 +126,7 @@ onMounted(() => {
   });
 
   // Use chessboardInputHandler.createInputHandler for handling user input
-  board.value.enableMoveInput(createInputHandler(chessboardStore));
+  if (props.playable)
+    board.value.enableMoveInput(createInputHandler(chessboardStore));
 });
 </script>

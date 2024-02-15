@@ -1,6 +1,9 @@
 <template>
   <div v-if="asset?.imx?.metadata" class="q-pa-md">
-    <ChessboardComponent :playable="false" :fen="asset.imx.metadata.FEN" />
+    <ChessboardComponent
+      :playable="false"
+      :fen="asset.imx.metadata.fen"
+      :rarity="asset.imx.metadata.rarity" />
 
     <div class="q-my-md text-center">
       <div class="text-h4 q-my-md">{{ asset.imx.metadata.name }}</div>
