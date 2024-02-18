@@ -122,7 +122,7 @@ onMounted(() => {
       { class: Markers, props: { autoMarkers: MARKER_TYPE.square } },
       { class: RarityBorder },
     ],
-    assetsUrl: 'node_modules/cm-chessboard/assets/',
+    assetsUrl: '/cm-chessboard/assets/',
   });
 
   // Use chessboardInputHandler.createInputHandler for handling user input

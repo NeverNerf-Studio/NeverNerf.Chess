@@ -30,7 +30,7 @@
       </q-btn>
     </div>
     <div>
-      <q-item class="q-py-xs">
+      <!-- <q-item class="q-py-xs">
         <q-item-section>
           <b>Turn: </b> {{ chessboardStore.turn }}</q-item-section
         >
@@ -92,7 +92,7 @@
             @click="copyToClipboard(chessboardStore.checkMate)"
             flat
             dense></q-btn> </q-item-section
-      ></q-item>
+      ></q-item> -->
     </div>
   </div>
 </template>
@@ -194,9 +194,9 @@ const assetRarity = computed(() => {
   }
 });
 
-const copyToClipboard = (text) => {
-  navigator.clipboard.writeText(text);
-};
+// const copyToClipboard = (text) => {
+//   navigator.clipboard.writeText(text);
+// };
 
 const handleNewGame = () => {
   chessboardStore.updateGameFromPGN('newgame');
