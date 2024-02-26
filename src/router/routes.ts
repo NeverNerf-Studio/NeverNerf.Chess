@@ -8,6 +8,7 @@ import GameplayFeature from 'pages/features/GameplayFeature.vue';
 import CraftingFeature from 'pages/features/CraftingFeature.vue';
 import AssureFeature from 'pages/features/AssureFeature.vue';
 import SettingsFeature from 'pages/features/SettingsFeature.vue';
+import AnimateFeature from 'pages/features/AnimateFeature.vue';
 
 export default [
   {
@@ -33,6 +34,20 @@ export default [
     path: '/:token_id',
     name: 'tokenLogin',
     component: LoginLayout,
+  },
+  {
+    path: '/:token_id/animate',
+    name: 'Animate Board',
+    icon: 'movie',
+    meta: { requiresAuth: false },
+    component: AnimateFeature,
+  },
+  {
+    path: '/:token_id/image',
+    name: 'Board Image',
+    icon: 'diamond',
+    meta: { requiresAuth: false },
+    component: AssetFeature,
   },
   {
     path: '/:token_id',

@@ -7,27 +7,33 @@
     </div>
     <div v-else-if="asset.loading">Loading...</div>
     <div v-else>
-      <q-header elevated justify-between>
-        <q-toolbar v-if="asset.imx">
-          <q-avatar>
-            <img :src="asset.collection_icon_url" />
-          </q-avatar>
-          <q-toolbar-title>
-            <span>Login</span>
-          </q-toolbar-title>
-        </q-toolbar>
-      </q-header>
       <q-page-container>
         <div v-if="asset.imx">
-          <!-- Asset hero image -->
           <div class="fixed-full">
-            <ChessboardComponent
-              :playable="false"
-              :fen="asset.imx.metadata.FEN" />
-            <div class="absolute-bottom text-center">
+            <video
+              class="video absolute-center"
+              muted
+              autoplay
+              loop
+              style="height: 80%; width: 100%">
+              <source :src="asset.imx.animation_url" type="video/mp4" />
+            </video>
+          </div>
+
+          <!-- Asset hero image -->
+          <div>
+            <div
+              class="absolute-center text-center shadow-5"
+              style="
+                background: rgba(0, 0, 0, 0.5) !important;
+                padding-top: 10px;
+                padding-left: 20px;
+                padding-right: 20px;
+              ">
               <span class="text-h5">
-                {{ asset.imx.metadata.name }}: {{ asset.imx.metadata.tagline }}
+                {{ asset.imx.name }}
               </span>
+              <div>{{ asset.imx.description }}</div>
               <passport-login-component />
               <!-- Guest Access -->
               <div style="padding-bottom: 20px">
@@ -57,12 +63,10 @@ import { onMounted, computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useAssetStore } from 'src/stores/asset-store';
 import PassportLoginComponent from 'src/components/PassportLoginComponent.vue';
-import ChessboardComponent from 'src/components/ChessboardComponent.vue';
 
 export default {
   components: {
     PassportLoginComponent,
-    ChessboardComponent,
   },
   setup() {
     const passport = usePassportStore();

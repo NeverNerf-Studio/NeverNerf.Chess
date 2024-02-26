@@ -36,6 +36,10 @@
   }
 }
 
+.rarity {
+  max-width: 500px;
+}
+
 .cm-chessboard.default.border-type-frame .board .border-inner {
   stroke: #000;
 }
@@ -110,9 +114,15 @@ watch(
 );
 
 onMounted(() => {
+  let boardFen = props.playable ? chessboardStore.fen : props.fen;
+  if (!boardFen && props.pgn) {
+    chessboardStore.updateGameFromPGN(props.pgn);
+    boardFen = chessboardStore.fen;
+  }
+
   // Initialize chessboard UI
   board.value = new Chessboard(boardElement.value, {
-    position: props.playable ? chessboardStore.fen : props.fen,
+    position: boardFen,
     style: {
       pieces: { file: 'pieces/staunty.svg' },
       animationDuration: 300,

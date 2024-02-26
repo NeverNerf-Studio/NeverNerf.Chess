@@ -5,22 +5,23 @@
   }
 
   &.uncommon {
-    --primary-color: #4caf50;
-    --secondary-color: #357a38;
+    --primary-color: url(#grass);
+    --secondary-color: url(#silverGradient);
   }
 
   &.rare {
-    --primary-color: #2196f3;
+    // --primary-color: #2196f3;
+    --primary-color: url(#hexTexture);
     --secondary-color: url(#diamondGradient);
   }
 
   &.epic {
-    --primary-color: #732888;
+    --primary-color: url(#complexTexture);
     --secondary-color: url(#diamondGradient);
   }
 
   &.legendary {
-    --primary-color: #000;
+    --primary-color: url(#darkWaves);
     --secondary-color: url(#silverGradient);
   }
 

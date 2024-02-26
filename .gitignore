@@ -45,4 +45,6 @@ yarn-error.log*
 yarn.lock
 
 # imx_metadata related directories and files
-/public/imx_metadata/*
+/public/assets/*
+/public/api/*
+/public/default.json

@@ -11,6 +11,7 @@ interface IMXMetadata {
   name: string;
   description: string | null;
   image_url: string;
+  animation_url: string;
   metadata: {
     name: string;
     fen: string;
@@ -64,9 +65,7 @@ export const useAssetStore = defineStore('asset', {
       if (collection_id === '0') return; // Don't load collection data for 0
 
       try {
-        const collectionConfigResponse = await fetch(
-          `/imx_metadata/${collection_id}.json`
-        );
+        const collectionConfigResponse = await fetch(`/${collection_id}.json`);
         if (!collectionConfigResponse.ok) {
           throw new Error(
             `Network response was not ok for collection: ${collection_id}`
@@ -105,9 +104,7 @@ export const useAssetStore = defineStore('asset', {
       }
       try {
         //Load token metadata
-        const response = await fetch(
-          `/imx_metadata/${token_id}/${token_id}.json`
-        );
+        const response = await fetch(`/api/${token_id}`);
         if (!response.ok) {
           throw new Error(`Network response was not ok for token: ${token_id}`);
         }
