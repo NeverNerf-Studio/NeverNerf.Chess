@@ -9,6 +9,7 @@ import CraftingFeature from 'pages/features/CraftingFeature.vue';
 import AssureFeature from 'pages/features/AssureFeature.vue';
 import SettingsFeature from 'pages/features/SettingsFeature.vue';
 import AnimateFeature from 'pages/features/AnimateFeature.vue';
+import ImageFeature from 'pages/features/ImageFeature.vue';
 
 export default [
   {
@@ -47,7 +48,7 @@ export default [
     name: 'Board Image',
     icon: 'diamond',
     meta: { requiresAuth: false },
-    component: AssetFeature,
+    component: ImageFeature,
   },
   {
     path: '/:token_id',

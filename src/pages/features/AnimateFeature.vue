@@ -1,9 +1,9 @@
 <template>
-  <div v-if="asset?.imx?.metadata">
+  <div v-if="asset?.metadata">
     <ChessboardComponent
       :playable="false"
-      :fen="asset.imx.metadata.fen"
-      :rarity="asset.imx.metadata.rarity" />
+      :fen="asset.metadata.fen"
+      :rarity="asset.metadata.rarity" />
 
     <q-btn
       color="primary"
@@ -48,12 +48,12 @@ const animate = () => {
   // Cleanup on component unmount
   onUnmounted(() => {
     clearInterval(intervalId);
-    chessboardStore.updateGameFromFen(assetStore.imx?.metadata.fen);
+    chessboardStore.updateGameFromFen(assetStore.metadata.fen);
   });
 };
 
 onMounted(() => {
   assetStore.loadMetadata(token_id.value);
-  chessboardStore.updateGameFromFen(assetStore.imx?.metadata.fen);
+  chessboardStore.updateGameFromFen(assetStore.metadata.fen);
 });
 </script>
