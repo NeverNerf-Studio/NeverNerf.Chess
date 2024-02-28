@@ -1,14 +1,9 @@
 <template>
   <q-layout view="hHh lpR fFf">
-    <div v-if="!token_id">
-      <div class="absolute-center text-center">
-        <passport-login-component />
-      </div>
-    </div>
-    <div v-else-if="asset.loading">Loading...</div>
+    <div v-if="asset.loading">Loading...</div>
     <div v-else>
       <q-page-container>
-        <div v-if="asset.imx">
+        <div v-if="asset.metadata">
           <div class="fixed-full">
             <video
               class="video absolute-center"
@@ -16,7 +11,7 @@
               autoplay
               loop
               style="height: 80%; width: 100%">
-              <source :src="asset.imx.animation_url" type="video/mp4" />
+              <source :src="asset.metadata.animation_url" type="video/mp4" />
             </video>
           </div>
 
@@ -31,13 +26,13 @@
                 padding-right: 20px;
               ">
               <span class="text-h5">
-                {{ asset.imx.name }}
+                {{ asset.metadata.name }}
               </span>
-              <div>{{ asset.imx.description }}</div>
+              <div>{{ asset.metadata.description }}</div>
               <passport-login-component />
               <!-- Guest Access -->
               <div style="padding-bottom: 20px">
-                <q-btn flat no-caps :to="`/${token_id}/asset`">
+                <q-btn flat no-caps :to="`/${asset.metadata.token_id}/asset`">
                   <div class="text-center"><u>View as Guest</u></div>
                 </q-btn>
               </div>
@@ -76,7 +71,6 @@ export default {
 
     onMounted(() => {
       checkAuthentication();
-      if (token_id.value) assetStore.loadMetadata(token_id.value);
     });
 
     async function checkAuthentication() {

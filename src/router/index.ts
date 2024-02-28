@@ -34,8 +34,12 @@ export default function (/* { store, ssrContext } */) {
     if (!useChessboardStore().fen) useChessboardStore().syncGameState();
     if (!useAssetStore().collection_id)
       await useAssetStore().loadCollection('default');
-    if (token_id !== '0' && token_id !== from_token_id)
+
+    if (!token_id) {
+      await useAssetStore().loadMetadata('1');
+    } else if (token_id !== '0' && token_id !== from_token_id) {
       await useAssetStore().loadMetadata(token_id);
+    }
 
     // if (process.env.DEV) {
     //   console.group('Router.beforeEach debug:');

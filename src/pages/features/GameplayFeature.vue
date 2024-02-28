@@ -1,5 +1,6 @@
 <template>
-  <div v-if="!assetStore.loading" class="q-pa-md">
+  <div v-if="asset.loading">Loading...</div>
+  <div v-else class="q-pa-md">
     <ChessboardComponent :playable="true" :rarity="assetRarity" />
     <div class="game-state-container" :class="backgroundClass">
       <img
@@ -28,71 +29,6 @@
         <div class="text-center">Mint</div>
         <q-tooltip class="bg-negative">Coming Soon!</q-tooltip>
       </q-btn>
-    </div>
-    <div>
-      <!-- <q-item class="q-py-xs">
-        <q-item-section>
-          <b>Turn: </b> {{ chessboardStore.turn }}</q-item-section
-        >
-        <q-item-section side>
-          <q-btn
-            icon="content_copy"
-            @click="copyToClipboard(chessboardStore.turn)"
-            flat
-            dense></q-btn> </q-item-section
-      ></q-item>
-      <q-item class="q-py-xs">
-        <q-item-section>
-          <b>fen: </b>
-          {{ chessboardStore.fen?.substr(0, 32) }}...</q-item-section
-        >
-        <q-item-section side>
-          <q-btn
-            icon="content_copy"
-            @click="copyToClipboard(chessboardStore.fen)"
-            flat
-            dense></q-btn> </q-item-section
-      ></q-item>
-      <q-item class="q-py-xs">
-        <q-item-section> <b>pgn: </b> {{ chessboardStore.pgn }}</q-item-section>
-        <q-item-section side>
-          <q-btn
-            icon="content_copy"
-            @click="copyToClipboard(chessboardStore.pgn)"
-            flat
-            dense></q-btn> </q-item-section
-      ></q-item>
-      <q-item class="q-py-xs">
-        <q-item-section> <b>Rarity: </b> {{ assetRarity }}</q-item-section>
-        <q-item-section side>
-          <q-btn
-            icon="content_copy"
-            @click="copyToClipboard(assetRarity)"
-            flat
-            dense></q-btn> </q-item-section
-      ></q-item>
-      <q-item class="q-py-xs">
-        <q-item-section>
-          <b>Check: </b> {{ chessboardStore.check }}</q-item-section
-        >
-        <q-item-section side>
-          <q-btn
-            icon="content_copy"
-            @click="copyToClipboard(chessboardStore.check)"
-            flat
-            dense></q-btn> </q-item-section
-      ></q-item>
-      <q-item class="q-py-xs">
-        <q-item-section>
-          <b>Checkmate: </b> {{ chessboardStore.checkMate }}</q-item-section
-        >
-        <q-item-section side>
-          <q-btn
-            icon="content_copy"
-            @click="copyToClipboard(chessboardStore.checkMate)"
-            flat
-            dense></q-btn> </q-item-section
-      ></q-item> -->
     </div>
   </div>
 </template>
@@ -147,7 +83,7 @@ import { useAssetStore } from 'src/stores/asset-store';
 import ChessboardComponent from 'src/components/ChessboardComponent.vue';
 import { useChessboardStore } from 'src/stores/chessboard-store';
 
-const assetStore = useAssetStore();
+const asset = computed(() => useAssetStore());
 const chessboardStore = useChessboardStore();
 const router = useRouter();
 
@@ -158,7 +94,7 @@ const assetName = computed(() => {
   if (token_id.value == '0') {
     return `Child of ${previousAssetName.value}`;
   } else {
-    return useAssetStore().imx.name;
+    return useAssetStore().metadata.name;
   }
 });
 
@@ -182,7 +118,7 @@ const assetDescription = computed(() => {
   if (token_id.value == '0') {
     return 'Striking off in unexplored territory';
   } else {
-    return useAssetStore().imx.description;
+    return useAssetStore().metadata.description;
   }
 });
 
@@ -190,23 +126,20 @@ const assetRarity = computed(() => {
   if (token_id.value === '0') {
     return 'Common';
   } else {
-    return assetStore.imx.metadata.rarity;
+    return useAssetStore().metadata.rarity;
   }
 });
-
-// const copyToClipboard = (text) => {
-//   navigator.clipboard.writeText(text);
-// };
 
 const handleNewGame = () => {
   chessboardStore.updateGameFromPGN('newgame');
 };
 
 const queryStringPgn = computed(() => useRoute().query.pgn);
+
 onMounted(() => {
   // If we're on a token then load that as PGN
   if (token_id.value !== '0' && chessboardStore.pgn === '') {
-    chessboardStore.updateGameFromPGN(assetStore.imx?.metadata.pgn);
+    chessboardStore.updateGameFromPGN(useAssetStore().metadata.pgn);
   }
   //Otherwise load from the query string pgn
   else if (!chessboardStore.pgn && queryStringPgn.value) {
@@ -218,8 +151,9 @@ onMounted(() => {
 watch(
   () => chessboardStore.fen,
   () => {
-    if (token_id.value != '0') previousAssetName.value = assetStore.imx.name;
-    const tokenExists = assetStore.getTokenIdByFen(chessboardStore.fen);
+    if (token_id.value != '0')
+      previousAssetName.value = useAssetStore().metadata.name;
+    const tokenExists = useAssetStore().getTokenIdByFen(chessboardStore.fen);
     if (tokenExists) {
       router.push(`/${tokenExists}/gameplay?pgn=${chessboardStore.pgn}`);
     } else {

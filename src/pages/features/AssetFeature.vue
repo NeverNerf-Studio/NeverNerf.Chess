@@ -1,27 +1,39 @@
 <template>
-  <div v-if="asset?.imx?.metadata" class="q-pa-md">
-    <ChessboardComponent
-      :playable="false"
-      :fen="asset.imx.metadata.fen"
-      :rarity="asset.imx.metadata.rarity" />
-
+  <div v-if="asset.loading">Loading...</div>
+  <div v-else class="q-pa-md">
+    <video class="video" muted autoplay loop style="height: 80%; width: 100%">
+      <source :src="asset.metadata.animation_url" type="video/mp4" />
+    </video>
     <div class="q-my-md text-center">
-      <div class="text-h4 q-my-md">{{ asset.imx.metadata.name }}</div>
-      <div class="text-subtitle2 q-my-md">{{ asset.imx.metadata.tagline }}</div>
+      <div class="text-h4 q-my-md">{{ asset.metadata.name }}</div>
+      <div class="text-subtitle2 q-my-md">{{ asset.metadata.description }}</div>
 
-      <q-list>
-        <q-item
-          v-for="(value, key) in filteredMetadata"
-          :key="key"
-          class="row justify-between">
-          <q-item-section>{{ key }}:</q-item-section>
-          <q-item-section>{{ value }}</q-item-section>
-        </q-item>
-      </q-list>
+      <q-item class="q-py-xs">
+        <q-item-section>
+          Rarity:
+          <RaritySVGbox :rarity="asset.metadata.rarity"
+        /></q-item-section>
+        <q-item-section>
+          Moves:
+          <div class="text-h4">{{ asset.metadata.moves }}</div>
+        </q-item-section>
+        <q-item-section side>
+          <q-btn
+            icon="content_copy"
+            label="PGN"
+            @click="copyToClipboard(asset.metadata.pgn)"
+            flat />
+          <q-btn
+            icon="content_copy"
+            label="FEN"
+            @click="copyToClipboard(asset.metadata.fen)"
+            flat />
+        </q-item-section>
+      </q-item>
     </div>
 
     <q-expansion-item icon="data_object" label="All Metadata" dense>
-      <div v-for="(value, key) in asset.imx" :key="key">
+      <div v-for="(value, key) in asset.metadata" :key="key">
         <div v-if="isObjectType(value)">
           <div class="text-subtitle1 q-my-md">{{ key }}</div>
           <q-separator />
@@ -55,44 +67,15 @@
       </div>
     </q-expansion-item>
   </div>
-  <div v-else class="text-h6 text-center q-my-md">Loading...</div>
 </template>
 
 <script setup>
-import { onMounted, computed } from 'vue';
+import { computed } from 'vue';
 import { useAssetStore } from 'src/stores/asset-store';
-import { useRoute } from 'vue-router';
-import ChessboardComponent from 'src/components/ChessboardComponent.vue';
+import RaritySVGbox from 'src/components/RaritySVGbox.vue';
 
 const asset = computed(() => assetStore);
-const token_id = computed(() => useRoute().params.token_id);
 const assetStore = useAssetStore();
-onMounted(() => {
-  assetStore.loadMetadata(token_id.value);
-});
-
-const filteredMetadata = computed(() => {
-  // Check if asset is not loaded or is undefined/null
-  if (!asset.value || asset.value.loading) {
-    // Return an empty object or any other default value
-    return {};
-  }
-  const keysToInclude = [
-    'class',
-    'series',
-    'element',
-    'faction',
-    'rarityStr',
-    'specialEditionStr',
-  ];
-  const metadata = asset.value.imx.metadata;
-  return keysToInclude.reduce((filtered, key) => {
-    if (metadata[key] !== undefined) {
-      filtered[key] = metadata[key];
-    }
-    return filtered;
-  }, {});
-});
 
 const truncateText = (text) => {
   if (typeof text === 'string' && text.length > 20) {
