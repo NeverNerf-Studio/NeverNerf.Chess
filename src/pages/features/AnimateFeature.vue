@@ -43,7 +43,7 @@ const animate = () => {
     } else {
       currentMoveIndex++; // Proceed to the next move
     }
-  }, 500); // Adjust the timing (1000ms = 1 second) based on your needs
+  }, 200); // Adjust the timing (1000ms = 1 second) based on your needs
 
   // Cleanup on component unmount
   onUnmounted(() => {

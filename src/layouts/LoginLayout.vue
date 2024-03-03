@@ -1,5 +1,12 @@
 <template>
   <q-layout view="hHh lpR fFf">
+    <q-header style="height: 48px" class="flex-center">
+      <div class="absolute-center">
+        <a href="https://nevernerf.com/">
+          <img style="max-height: 25px" src="/NeverNerfLogo.png" />
+        </a>
+      </div>
+    </q-header>
     <div v-if="asset.loading">Loading...</div>
     <div v-else>
       <q-page-container>
@@ -10,6 +17,8 @@
               muted
               autoplay
               loop
+              webkit-playsinline
+              playsinline
               style="height: 80%; width: 100%">
               <source :src="asset.metadata.animation_url" type="video/mp4" />
             </video>
@@ -41,14 +50,6 @@
         </div>
       </q-page-container>
     </div>
-    <q-footer right>
-      <q-btn flat href="https://nevernerf.com" push no-caps>
-        <div class="row items-center no-wrap">
-          <q-icon left name="img:/NeverNerfLogo.svg" />
-          <div class="text-center">NeverNerf.com</div>
-        </div>
-      </q-btn>
-    </q-footer>
   </q-layout>
 </template>
 

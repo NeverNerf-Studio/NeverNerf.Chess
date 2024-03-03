@@ -1,48 +1,79 @@
 <template>
-  <div v-if="asset.loading">Loading...</div>
-  <div v-else class="q-pa-md">
-    <ChessboardComponent :playable="true" :rarity="assetRarity" />
-    <div class="game-state-container" :class="backgroundClass">
-      <img
-        v-if="chessboardStore.check || chessboardStore.checkMate"
-        :src="kingPieceIconSrc"
-        class="state-icon" />
-      <h5 class="asset-name">{{ assetName }}</h5>
-      <img
-        v-if="chessboardStore.check || chessboardStore.checkMate"
-        :src="kingPieceIconSrc"
-        class="state-icon" />
-      <div class="text-subtitle">
-        {{ assetDescription }}
-      </div>
+  <div v-if="!asset.metadata">Loading...</div>
+  <div v-else>
+    <div class="row flex-center">
+      <q-card flat class="row flex-center" style="width: 100%">
+        <q-card-section
+          class="col-12 col-sm-10"
+          :style="
+            $q.screen.lt.sm
+              ? 'max-width: 450px; width:100%;'
+              : 'max-width: 500px; width:100%;'
+          ">
+          <ChessboardComponent :playable="true" :rarity="assetRarity" />
+        </q-card-section>
+        <q-card-section
+          class="col-12 col-sm-2 justify-around"
+          :class="$q.screen.lt.sm ? 'row' : 'col'">
+          <div class="justify-left">
+            <q-btn
+              flat
+              no-caps
+              icon="refresh"
+              color="blue"
+              dense
+              @click="handleNewGame">
+              <div class="text-center">New Game</div>
+              <q-tooltip class="primary">Start new game</q-tooltip>
+            </q-btn>
+            <q-btn flat no-caps icon="videogame_asset" disable>
+              <div class="text-center">Invite</div>
+              <q-tooltip class="bg-negative">Coming Soon!</q-tooltip>
+            </q-btn>
+            <q-btn flat no-caps icon="shopping_cart" disable>
+              <div class="text-center">Mint</div>
+              <q-tooltip class="bg-negative">Coming Soon!</q-tooltip>
+            </q-btn>
+          </div>
+        </q-card-section>
+      </q-card>
     </div>
-    <div style="padding-bottom: 20px">
-      <q-btn flat no-caps color="blue" @click="handleNewGame">
-        <div class="text-center">New Game</div>
-        <q-tooltip class="primary">Start new game</q-tooltip>
-      </q-btn>
-      <q-btn flat no-caps disable>
-        <div class="text-center">Invite</div>
-        <q-tooltip class="bg-negative">Coming Soon!</q-tooltip>
-      </q-btn>
-      <q-btn flat no-caps disable>
-        <div class="text-center">Mint</div>
-        <q-tooltip class="bg-negative">Coming Soon!</q-tooltip>
-      </q-btn>
+    <div class="col-auto self-stretch">
+      <q-card flat>
+        <q-card-section
+          class="text-center q-pa-none game-state-container"
+          :class="backgroundClass">
+          <div class="text-h6">
+            <img
+              v-if="chessboardStore.check || chessboardStore.checkMate"
+              :src="kingPieceIconSrc"
+              class="state-icon" />
+            {{ assetName }}
+            <img
+              v-if="chessboardStore.check || chessboardStore.checkMate"
+              :src="kingPieceIconSrc"
+              class="state-icon" />
+          </div>
+
+          <div class="text-subtitle2">
+            {{ assetDescription }}
+          </div>
+        </q-card-section>
+      </q-card>
     </div>
   </div>
 </template>
 
 <style>
-.game-state-container {
+/* .game-state-container {
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 10px;
   margin-top: 5px;
-  border-radius: 10px; /* Rounded corners */
-  transition: all 0.3s ease; /* Smooth transition for background color */
-}
+  border-radius: 10px;
+  transition: all 0.3s ease;
+} */
 
 .check-bg {
   background-color: #ff8c00;
@@ -108,7 +139,7 @@ const backgroundClass = computed(() => {
 
 const kingPieceIconSrc = computed(() => {
   const pieceColor = chessboardStore.turn;
-  const kingPiece = `/chesspieces/wikipedia/${pieceColor}K.png`;
+  const kingPiece = `/chesspieces/wikipedia/${pieceColor}k.png`;
   return kingPiece;
 });
 

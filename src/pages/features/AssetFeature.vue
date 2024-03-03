@@ -1,71 +1,97 @@
 <template>
   <div v-if="asset.loading">Loading...</div>
-  <div v-else class="q-pa-md">
-    <video class="video" muted autoplay loop style="height: 80%; width: 100%">
-      <source :src="asset.metadata.animation_url" type="video/mp4" />
-    </video>
-    <div class="q-my-md text-center">
-      <div class="text-h4 q-my-md">{{ asset.metadata.name }}</div>
-      <div class="text-subtitle2 q-my-md">{{ asset.metadata.description }}</div>
-
-      <q-item class="q-py-xs">
-        <q-item-section>
-          Rarity:
-          <RaritySVGbox :rarity="asset.metadata.rarity"
-        /></q-item-section>
-        <q-item-section>
-          Moves:
-          <div class="text-h4">{{ asset.metadata.moves }}</div>
-        </q-item-section>
-        <q-item-section side>
-          <q-btn
-            icon="content_copy"
-            label="PGN"
-            @click="copyToClipboard(asset.metadata.pgn)"
-            flat />
-          <q-btn
-            icon="content_copy"
-            label="FEN"
-            @click="copyToClipboard(asset.metadata.fen)"
-            flat />
-        </q-item-section>
-      </q-item>
+  <div v-else>
+    <div class="col-auto self-stretch">
+      <q-card flat>
+        <q-card-section class="text-center q-pa-none">
+          <div class="text-h6">{{ asset.metadata.name }}</div>
+          <div class="text-subtitle2">{{ asset.metadata.description }}</div>
+        </q-card-section>
+      </q-card>
     </div>
-
-    <q-expansion-item icon="data_object" label="All Metadata" dense>
-      <div v-for="(value, key) in asset.metadata" :key="key">
-        <div v-if="isObjectType(value)">
-          <div class="text-subtitle1 q-my-md">{{ key }}</div>
-          <q-separator />
-          <div v-for="(nestedValue, nestedKey) in value" :key="nestedKey">
-            <q-item class="q-py-xs">
-              <q-item-section>{{ nestedKey }}:</q-item-section>
-              <q-item-section>{{ formatValue(nestedValue) }}</q-item-section>
-              <q-item-section side>
-                <q-btn
-                  icon="content_copy"
-                  @click="copyToClipboard(nestedValue)"
-                  flat
-                  dense />
-              </q-item-section>
-            </q-item>
+    <div class="row flex-center self-stretch">
+      <q-card
+        flat
+        class="row"
+        :style="$q.screen.lt.sm ? 'max-width: 450px;' : 'max-width: 500px;'">
+        <q-card-section class="col-12 col-sm-10">
+          <video
+            class="video"
+            style="width: 100%"
+            muted
+            autoplay
+            loop
+            webkit-playsinline
+            playsinline>
+            <source :src="asset.metadata.animation_url" type="video/mp4" />
+          </video>
+        </q-card-section>
+        <q-card-section
+          class="col-12 col-sm-2 justify-around"
+          :class="$q.screen.lt.sm ? 'row' : 'col'">
+          <div>
+            <div class="text-h6">Rarity</div>
+            <RaritySVGbox :rarity="asset.metadata.rarity" />
           </div>
-        </div>
-        <div v-else>
-          <q-item class="q-py-xs">
-            <q-item-section>{{ key }}:</q-item-section>
-            <q-item-section>{{ formatValue(value) }}</q-item-section>
-            <q-item-section side>
-              <q-btn
-                icon="content_copy"
-                @click="copyToClipboard(value)"
-                flat
-                dense />
-            </q-item-section>
-          </q-item>
-        </div>
-      </div>
-    </q-expansion-item>
+          <div>
+            <div class="text-h6">Move</div>
+            <div class="text-h5">#{{ asset.metadata.moves }}</div>
+          </div>
+          <div class="align-bottom">
+            <q-btn
+              icon="content_copy"
+              label="PGN"
+              @click="copyToClipboard(asset.metadata.pgn)"
+              flat
+              dense />
+            <q-btn
+              icon="content_copy"
+              label="FEN"
+              @click="copyToClipboard(asset.metadata.fen)"
+              flat
+              dense />
+          </div>
+        </q-card-section>
+        <q-card-section class="col-12">
+          <q-expansion-item icon="data_object" label="All Metadata" dense>
+            <div v-for="(value, key) in asset.metadata" :key="key">
+              <div v-if="isObjectType(value)">
+                <div class="text-subtitle1 q-my-md">{{ key }}</div>
+                <q-separator />
+                <div v-for="(nestedValue, nestedKey) in value" :key="nestedKey">
+                  <q-item class="q-py-xs">
+                    <q-item-section>{{ nestedKey }}:</q-item-section>
+                    <q-item-section>{{
+                      formatValue(nestedValue)
+                    }}</q-item-section>
+                    <q-item-section side>
+                      <q-btn
+                        icon="content_copy"
+                        @click="copyToClipboard(nestedValue)"
+                        flat
+                        dense />
+                    </q-item-section>
+                  </q-item>
+                </div>
+              </div>
+              <div v-else>
+                <q-item class="q-py-xs">
+                  <q-item-section>{{ key }}:</q-item-section>
+                  <q-item-section>{{ formatValue(value) }}</q-item-section>
+                  <q-item-section side>
+                    <q-btn
+                      icon="content_copy"
+                      @click="copyToClipboard(value)"
+                      flat
+                      dense />
+                  </q-item-section>
+                </q-item>
+              </div>
+            </div>
+          </q-expansion-item>
+        </q-card-section>
+      </q-card>
+    </div>
   </div>
 </template>
 
