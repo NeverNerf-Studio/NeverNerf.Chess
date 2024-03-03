@@ -52,41 +52,34 @@
               dense />
           </div>
         </q-card-section>
-        <q-card-section class="col-12">
-          <q-expansion-item icon="data_object" label="All Metadata" dense>
-            <div v-for="(value, key) in asset.metadata" :key="key">
-              <div v-if="isObjectType(value)">
-                <div class="text-subtitle1 q-my-md">{{ key }}</div>
-                <q-separator />
-                <div v-for="(nestedValue, nestedKey) in value" :key="nestedKey">
-                  <q-item class="q-py-xs">
-                    <q-item-section>{{ nestedKey }}:</q-item-section>
-                    <q-item-section>{{
-                      formatValue(nestedValue)
-                    }}</q-item-section>
-                    <q-item-section side>
-                      <q-btn
-                        icon="content_copy"
-                        @click="copyToClipboard(nestedValue)"
-                        flat
-                        dense />
-                    </q-item-section>
-                  </q-item>
-                </div>
-              </div>
-              <div v-else>
-                <q-item class="q-py-xs">
-                  <q-item-section>{{ key }}:</q-item-section>
-                  <q-item-section>{{ formatValue(value) }}</q-item-section>
-                  <q-item-section side>
-                    <q-btn
-                      icon="content_copy"
-                      @click="copyToClipboard(value)"
-                      flat
-                      dense />
-                  </q-item-section>
-                </q-item>
-              </div>
+        <q-card-section class="col-12 q-px-none flex-center">
+          <q-expansion-item
+            expand-separator
+            class="col-12 q-px-none flex-center"
+            icon="data_object"
+            label="All Metadata"
+            dense>
+            <div
+              class="col-12 q-px-none"
+              v-for="(value, key) in asset.metadata"
+              :key="key">
+              <q-item
+                class="q-px-none row justify-between"
+                :style="$q.screen.lt.sm ? 'max-width: 310px;' : ''">
+                <q-item-section class="col-2 text-weight-bold ellipsis"
+                  >{{ key }}:</q-item-section
+                >
+                <q-item-section class="col-9 ellipsis">{{
+                  value
+                }}</q-item-section>
+                <q-item-section class="col-1" side>
+                  <q-btn
+                    icon="content_copy"
+                    @click="copyToClipboard(value)"
+                    flat
+                    dense />
+                </q-item-section>
+              </q-item>
             </div>
           </q-expansion-item>
         </q-card-section>
@@ -102,24 +95,6 @@ import RaritySVGbox from 'src/components/RaritySVGbox.vue';
 
 const asset = computed(() => assetStore);
 const assetStore = useAssetStore();
-
-const truncateText = (text) => {
-  if (typeof text === 'string' && text.length > 20) {
-    return text.substr(0, 5) + '...' + text.substr(-5);
-  }
-  return text;
-};
-
-const formatValue = (value) => {
-  if (typeof value === 'object') {
-    return JSON.stringify(value, null, 2);
-  }
-  return truncateText(value);
-};
-
-const isObjectType = (value) => {
-  return value !== null && typeof value === 'object' && !Array.isArray(value);
-};
 
 const copyToClipboard = (text) => {
   navigator.clipboard.writeText(text);
