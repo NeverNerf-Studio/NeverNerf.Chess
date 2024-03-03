@@ -14,7 +14,7 @@
 </template>
 
 <script setup>
-import { onMounted, computed, onUnmounted, ref } from 'vue';
+import { onMounted, computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import ChessboardComponent from 'src/components/ChessboardComponent.vue';
 import { useChessboardStore } from 'src/stores/chessboard-store';
@@ -28,28 +28,37 @@ const playButtonLabel = ref('Play');
 
 const animate = () => {
   playButtonLabel.value = '...';
+  chessboardStore.updateGameFromPGN(assetStore.metadata.pgn);
   const validMoves = chessboardStore.$state.chess.moves();
-  console.log(validMoves);
+  const historyMoves = chessboardStore.$state.chess.history();
+
+  // Determine the moves for animation based on the number of history moves
+  const animationMoves = historyMoves.length > 2 ? historyMoves : validMoves;
+
+  // Initialize chessboardStore conditionally
+  if (historyMoves.length <= 2) {
+    chessboardStore.updateGameFromFen(assetStore.metadata.fen);
+  } else {
+    chessboardStore.updateGameFromPGN('newgame');
+  }
+
+  console.log(animationMoves);
   let currentMoveIndex = 0; // Start with the first move
 
   const intervalId = setInterval(() => {
-    if (currentMoveIndex > 0) chessboardStore.$state.chess.undo();
-    chessboardStore.makeMove(validMoves[currentMoveIndex]);
+    if (historyMoves.length <= 2) {
+      chessboardStore.updateGameFromFen(assetStore.metadata.fen);
+    }
+    chessboardStore.makeMove(animationMoves[currentMoveIndex]);
 
-    if (currentMoveIndex >= validMoves.length - 1) {
-      // Check if this is the last move
-      clearInterval(intervalId); // Stop the animation
-      playButtonLabel.value = 'Done'; // Update the label after animation completes
+    if (currentMoveIndex < animationMoves.length) {
+      chessboardStore.makeMove(animationMoves[currentMoveIndex]);
+      currentMoveIndex++;
     } else {
-      currentMoveIndex++; // Proceed to the next move
+      clearInterval(intervalId); // Stop the interval when all moves are played
+      playButtonLabel.value = 'Done'; // Update the label after animation completes
     }
   }, 200); // Adjust the timing (1000ms = 1 second) based on your needs
-
-  // Cleanup on component unmount
-  onUnmounted(() => {
-    clearInterval(intervalId);
-    chessboardStore.updateGameFromFen(assetStore.metadata.fen);
-  });
 };
 
 onMounted(() => {
