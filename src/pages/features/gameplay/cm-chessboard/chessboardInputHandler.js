@@ -21,6 +21,7 @@ export function createInputHandler() {
         return chessboardStore.makeMove(move);
       case INPUT_EVENT_TYPE.moveInputFinished:
         removeMarkers(event.chessboard);
+        event.chessboard.removeArrows();
         break;
       // default:
       //   removeMarkers(event.chessboard);

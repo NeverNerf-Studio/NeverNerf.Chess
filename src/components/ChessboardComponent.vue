@@ -48,12 +48,18 @@
 
 <script setup>
 //cm-chessboard imports, manages gameboard and UI
-import 'cm-chessboard/assets/chessboard.css';
+import 'src/css/cm-chessboard/chessboard.css';
+import 'src/css/cm-chessboard/arrows.css';
+
 import { Chessboard } from 'cm-chessboard/src/Chessboard.js';
 import {
   MARKER_TYPE,
   Markers,
 } from 'cm-chessboard/src/extensions/markers/Markers.js';
+import {
+  ARROW_TYPE,
+  Arrows,
+} from 'cm-chessboard/src/extensions/arrows/Arrows.js';
 import { RarityBorder } from 'src/pages/features/gameplay/cm-chessboard/extensions/rarityBorder.js';
 import { useChessboardStore } from 'src/stores/chessboard-store';
 import { createInputHandler } from 'src/pages/features/gameplay/cm-chessboard/chessboardInputHandler.js';
@@ -106,7 +112,27 @@ watch(
   () => chessboardStore.pgn,
   () => {
     if (board.value) {
+      board.value.removeArrows();
+      board.value.removeMarkers();
       board.value.setPosition(chessboardStore.fen);
+    }
+  },
+  {
+    immediate: false,
+  }
+);
+
+watch(
+  () => chessboardStore.bestMove,
+  () => {
+    //Highlight best move
+    if (!chessboardStore.check && chessboardStore.bestMove) {
+      board.value.addMarker(MARKER_TYPE.bevel, chessboardStore.bestMove.to);
+      board.value.addArrow(
+        ARROW_TYPE.pointy,
+        chessboardStore.bestMove.from,
+        chessboardStore.bestMove.to
+      );
     }
   },
   {
@@ -125,15 +151,16 @@ onMounted(() => {
   board.value = new Chessboard(boardElement.value, {
     position: boardFen,
     style: {
-      pieces: { file: 'pieces/staunty.svg' },
+      pieces: { file: 'chesspieces/pieces/staunty.svg' },
       animationDuration: 300,
       borderType: 'frame',
     },
     extensions: [
       { class: Markers, props: { autoMarkers: MARKER_TYPE.square } },
       { class: RarityBorder },
+      { class: Arrows },
     ],
-    assetsUrl: '/cm-chessboard/assets/',
+    assetsUrl: '/chess/',
   });
 
   // Use chessboardInputHandler.createInputHandler for handling user input

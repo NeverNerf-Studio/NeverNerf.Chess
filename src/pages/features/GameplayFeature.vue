@@ -1,5 +1,5 @@
 <template>
-  <div v-if="!asset.metadata">Loading...</div>
+  <div v-if="token_id != '0' && !asset.metadata">Loading...</div>
   <div v-else>
     <div class="row flex-center">
       <q-card flat class="row flex-center" style="width: 100%">

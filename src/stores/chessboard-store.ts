@@ -1,9 +1,11 @@
 import { defineStore } from 'pinia';
-import { Chess, Square } from 'src/pages/features/gameplay/chessjs/chess';
-
+import { Chess, Square, Move } from 'src/pages/features/gameplay/chessjs/chess';
+import { bestMove } from 'src/services/nevernerf';
 export const useChessboardStore = defineStore('chessboard', {
   state: () => ({
     chess: new Chess(),
+    bestMove: null as Move | null,
+    bestMoveLoading: false,
     fen: '',
     pgn: '',
     turn: 'w',
@@ -21,6 +23,7 @@ export const useChessboardStore = defineStore('chessboard', {
         console.error(err);
       } finally {
         this.syncGameState();
+        this.getBestMove();
       }
     },
     updateGameFromPGN(pgn: string) {
@@ -35,15 +38,28 @@ export const useChessboardStore = defineStore('chessboard', {
         console.error(err);
       } finally {
         this.syncGameState();
+        this.getBestMove();
       }
     },
-    syncGameState() {
+    async syncGameState() {
       this.fen = this.chess.fen();
       this.pgn = this.chess.pgn();
       this.turn = this.chess.turn();
       this.check = this.chess.isCheck();
       this.checkMate = this.chess.isCheckmate();
       this.moves = this.chess.moves();
+    },
+    async getBestMove() {
+      if (!this.checkMate && !this.bestMoveLoading) {
+        const bestMoveFen = this.chess.fen();
+        this.bestMoveLoading = true;
+        const bestMoveResponse = await bestMove(bestMoveFen);
+
+        //Is FEN still the same?
+        if (this.fen === bestMoveFen) this.bestMove = bestMoveResponse;
+
+        this.bestMoveLoading = false;
+      }
     },
     isPromotion(move: { from: string; to: string }) {
       const possibleMoves = this.chess.moves({
@@ -70,6 +86,7 @@ export const useChessboardStore = defineStore('chessboard', {
         const result = this.chess.move(move);
         if (result) {
           this.syncGameState();
+          this.getBestMove();
         }
         return result;
       } catch (err) {

@@ -1,0 +1,37 @@
+.cm-chessboard .arrow-default .arrow-head {
+  fill: blue;
+  fill-rule: nonzero;
+  fill-opacity: 1;
+}
+
+.cm-chessboard .arrow-default .arrow-line {
+  stroke: blue;
+  stroke-linecap: round;
+  opacity: 0.5;
+}
+
+.cm-chessboard .arrow-danger .arrow-head {
+  fill: red;
+  fill-rule: nonzero;
+  fill-opacity: 1;
+}
+
+.cm-chessboard .arrow-danger .arrow-line {
+  stroke: red;
+  stroke-linecap: round;
+  opacity: 0.5;
+}
+
+.cm-chessboard .arrow-pointy .arrow-head {
+  fill: #1f52ba;
+  fill-rule: nonzero;
+  fill-opacity: 1;
+}
+
+.cm-chessboard .arrow-pointy .arrow-line {
+  stroke: #1f52ba;
+  stroke-linecap: round;
+  opacity: 0.5;
+}
+
+/*# sourceMappingURL=arrows.css.map */
