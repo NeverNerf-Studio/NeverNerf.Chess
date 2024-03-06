@@ -139,7 +139,7 @@ const backgroundClass = computed(() => {
 
 const kingPieceIconSrc = computed(() => {
   const pieceColor = chessboardStore.turn;
-  const kingPiece = `/chesspieces/wikipedia/${pieceColor}k.png`;
+  const kingPiece = `chess/chesspieces/wikipedia/${pieceColor}k.png`;
   return kingPiece;
 });
 
@@ -176,6 +176,7 @@ onMounted(() => {
   else if (!chessboardStore.pgn && queryStringPgn.value) {
     chessboardStore.updateGameFromPGN(queryStringPgn.value);
   }
+  console.log(chessboardStore.fen);
 });
 
 // Reactive watch on the chessboard store's state

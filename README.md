@@ -1,41 +1,30 @@
-# nevernerf-app (nevernerf-app)
+# NeverNerf.Chess
 
 NeverNerf
 
 ## Install the dependencies
+
 ```bash
 yarn
-# or
-npm install
 ```
 
-### Start the app in development mode (hot-code reloading, error reporting, etc.)
+## Start the app in development mode (hot-code reloading, error reporting, etc.)
+
 ```bash
-quasar dev
+yarn quasar dev
 ```
 
+## Build the app into /dist/spa for production
 
-### Lint the files
 ```bash
-yarn lint
-# or
-npm run lint
+yarn quasar dev
 ```
 
+### Passport
 
-### Format the files
-```bash
-yarn format
-# or
-npm run format
-```
+### Localhost config
 
-
-
-### Build the app for production
-```bash
-quasar build
-```
-
-### Customize the configuration
-See [Configuring quasar.config.js](https://v2.quasar.dev/quasar-cli-vite/quasar-config-js).
+Application Type: Website
+Application Name: NeverNerf.Chess.Testnet
+RedirectURL: http://*localhost:9000/#/callback
+Logout URL: http://*localhost:9000/#/logout

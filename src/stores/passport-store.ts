@@ -21,7 +21,10 @@ export const usePassportStore = defineStore('passport', {
         userProfile = await immutableService.login(); // Perform a full login
       }
       if (userProfile) {
-        this.provider = await immutableService.connectImx();
+        const imxProvider = await immutableService.connectImx();
+        if (imxProvider) {
+          this.provider = imxProvider;
+        }
         this.buttonState = 'Connected';
       } else {
         this.buttonState = 'Connect Passport';
