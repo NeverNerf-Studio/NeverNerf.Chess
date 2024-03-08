@@ -176,7 +176,6 @@ onMounted(() => {
   else if (!chessboardStore.pgn && queryStringPgn.value) {
     chessboardStore.updateGameFromPGN(queryStringPgn.value);
   }
-  console.log(chessboardStore.fen);
 });
 
 // Reactive watch on the chessboard store's state

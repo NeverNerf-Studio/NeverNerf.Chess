@@ -5,7 +5,7 @@ import {
   createWebHashHistory,
 } from 'vue-router';
 import routes from './routes';
-//import { usePassportStore } from 'src/stores/passport-store'; // Import Passport store
+import { usePassportStore } from 'src/stores/passport-store'; // Import Passport store
 import { useAssetStore } from 'src/stores/asset-store'; // Import Asset store
 import { useChessboardStore } from 'src/stores/chessboard-store';
 
@@ -23,9 +23,11 @@ export default function (/* { store, ssrContext } */) {
   });
 
   Router.beforeEach(async (to, from, next) => {
-    // const passport = usePassportStore(); // Use the Passport store
-    // const isAuthenticated = await passport.getUserInfo(); // Check if the user is authenticated
-    const isAuthenticated = false;
+    const passport = usePassportStore(); // Use the Passport store
+    if (passport.isAuthenticated) {
+      passport.getAddress();
+    }
+
     const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
     const publicAltRoute = to.meta.publicAltRoute;
     const token_id = to.params.token_id as string;
@@ -59,7 +61,7 @@ export default function (/* { store, ssrContext } */) {
     if (to.path == '/logout') next(`/${token_id}/asset`);
 
     //Enforce route requiresAuth, use the publicAlt if available, redirect to tokenID root if has one otherwise /
-    if (requiresAuth && !isAuthenticated) {
+    if (requiresAuth && !passport.isAuthenticated) {
       if (publicAltRoute && typeof publicAltRoute === 'string') {
         next({ name: publicAltRoute });
       } else {

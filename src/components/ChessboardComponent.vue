@@ -65,7 +65,7 @@ import { useChessboardStore } from 'src/stores/chessboard-store';
 import { createInputHandler } from 'src/pages/features/gameplay/cm-chessboard/chessboardInputHandler.js';
 
 //vue imports
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { watch } from 'vue';
 
 // Define props
@@ -139,6 +139,13 @@ watch(
     immediate: false,
   }
 );
+
+onBeforeUnmount(() => {
+  // Cleanup function
+  if (board.value) {
+    board.value.destroy();
+  }
+});
 
 onMounted(() => {
   let boardFen = props.playable ? chessboardStore.fen : props.fen;

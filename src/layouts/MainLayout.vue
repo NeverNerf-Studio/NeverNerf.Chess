@@ -50,7 +50,7 @@ export default {
     const accessibleRoutes = ref([]);
     const updateAccessibleRoutes = () => {
       const menuRoutes = routes.find((route) => route.name === 'menuRoot');
-      accessibleRoutes.value = passport.userProfile
+      accessibleRoutes.value = passport.isAuthenticated
         ? menuRoutes.children
         : menuRoutes.children.filter(
             (childRoute) => childRoute.meta && !childRoute.meta.requiresAuth

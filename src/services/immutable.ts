@@ -12,7 +12,7 @@ export class ImmutableService {
         },
         clientId: process.env.PASSPORT_clientId as string,
         redirectUri: `${window.location.protocol}//${window.location.host}/#/callback`,
-        logoutRedirectUri: `${window.location.protocol}//${window.location.host}/#//logout`,
+        logoutRedirectUri: `${window.location.protocol}//${window.location.host}/#/logout`,
         audience: process.env.PASSPORT_audience,
         scope: process.env.PASSPORT_scope,
       });
@@ -37,6 +37,22 @@ export class ImmutableService {
     return await this.passportInstance?.getUserInfo();
   }
 
+  async getAccounts() {
+    const zkEVMProvider = this.passportInstance?.connectEvm();
+    if (!zkEVMProvider) return;
+
+    const zkevmAccounts = await zkEVMProvider.request({
+      method: 'eth_accounts',
+    });
+    console.log(zkevmAccounts);
+
+    const imxProvider = await this.passportInstance?.connectImx();
+    if (!imxProvider) return;
+
+    const imxAccounts = await imxProvider.getAddress();
+    console.log(imxAccounts);
+  }
+
   async login(useCachedSession = false) {
     try {
       return await this.passportInstance?.login({ useCachedSession });
@@ -45,5 +61,3 @@ export class ImmutableService {
     }
   }
 }
-
-export const immutableService = new ImmutableService();

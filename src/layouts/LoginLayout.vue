@@ -54,40 +54,37 @@
 </template>
 
 <script>
-import { usePassportStore } from '/src/stores/passport-store';
-import { onMounted, computed } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
-import { useAssetStore } from 'src/stores/asset-store';
+import { computed } from 'vue';
 import PassportLoginComponent from 'src/components/PassportLoginComponent.vue';
+import { useAssetStore } from 'src/stores/asset-store';
 
 export default {
   components: {
     PassportLoginComponent,
   },
   setup() {
-    const passport = usePassportStore();
-    const token_id = computed(() => useRoute().params.token_id);
-    const assetStore = useAssetStore();
-    const router = useRouter();
+    // const passport = usePassportStore();
+    // const token_id = computed(() => useRoute().params.token_id);
+    // const assetStore = useAssetStore();
+    // const router = useRouter();
 
-    onMounted(() => {
-      checkAuthentication();
-    });
+    // onMounted(() => {
+    //   checkAuthentication();
+    // });
 
-    async function checkAuthentication() {
-      try {
-        const userInfo = await passport.getUserInfo();
-        if (userInfo) {
-          router.push(`/${token_id.value}/asset`);
-        }
-      } catch (error) {
-        console.error('Error checking authentication:', error);
-      }
-    }
+    // async function checkAuthentication() {
+    //   try {
+    //     const userInfo = await passport.getUserInfo();
+    //     if (userInfo) {
+    //       router.push(`/${token_id.value}/asset`);
+    //     }
+    //   } catch (error) {
+    //     console.error('Error checking authentication:', error);
+    //   }
+    // }
 
     return {
-      token_id,
-      asset: computed(() => assetStore),
+      asset: computed(() => useAssetStore()),
     };
   },
 };
