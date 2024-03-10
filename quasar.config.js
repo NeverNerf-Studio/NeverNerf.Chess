@@ -10,8 +10,9 @@
 
 const { configure } = require('quasar/wrappers');
 const path = require('path');
+const { nodePolyfills } = require('vite-plugin-node-polyfills');
 
-module.exports = configure(function (/* ctx */) {
+module.exports = configure(function (ctx) {
   return {
     eslint: {
       // fix: true,
@@ -90,6 +91,21 @@ module.exports = configure(function (/* ctx */) {
       // viteVuePluginOptions: {},
 
       vitePlugins: [
+        [
+          nodePolyfills({
+            include: ['path', 'stream', 'util'],
+            exclude: ['http'],
+            globals: {
+              Buffer: true,
+              global: true,
+              process: true,
+            },
+            overrides: {
+              fs: 'memfs',
+            },
+            protocolImports: true,
+          }),
+        ],
         [
           '@intlify/vite-plugin-vue-i18n',
           {

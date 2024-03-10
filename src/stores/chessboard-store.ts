@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { Chess, Square, Move } from 'src/pages/features/gameplay/chessjs/chess';
-import { bestMove } from 'src/services/nevernerf';
+import { moveHint } from 'src/services/nevernerf';
 export const useChessboardStore = defineStore('chessboard', {
   state: () => ({
     chess: new Chess(),
@@ -53,7 +53,7 @@ export const useChessboardStore = defineStore('chessboard', {
       if (!this.checkMate && !this.bestMoveLoading) {
         const bestMoveFen = this.chess.fen();
         this.bestMoveLoading = true;
-        const bestMoveResponse = await bestMove(bestMoveFen);
+        const bestMoveResponse = await moveHint(bestMoveFen);
 
         //Is FEN still the same?
         if (this.fen === bestMoveFen) this.bestMove = bestMoveResponse;

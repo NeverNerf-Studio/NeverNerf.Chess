@@ -37,20 +37,19 @@ export class ImmutableService {
     return await this.passportInstance?.getUserInfo();
   }
 
-  async getAccounts() {
-    const zkEVMProvider = this.passportInstance?.connectEvm();
-    if (!zkEVMProvider) return;
-
-    const zkevmAccounts = await zkEVMProvider.request({
-      method: 'eth_accounts',
-    });
-    console.log(zkevmAccounts);
-
+  async getAddress(): Promise<string> {
     const imxProvider = await this.passportInstance?.connectImx();
-    if (!imxProvider) return;
+    if (!imxProvider) return '';
 
-    const imxAccounts = await imxProvider.getAddress();
-    console.log(imxAccounts);
+    let imxAddress = '';
+    try {
+      imxAddress = await imxProvider.getAddress();
+    } catch (error) {
+      await imxProvider.registerOffchain();
+      imxAddress = await imxProvider.getAddress();
+    }
+
+    return imxAddress;
   }
 
   async login(useCachedSession = false) {

@@ -7,6 +7,7 @@
       rounded
       color="grey-1"
       @click="login"
+      :loading="loggingIn"
       style="width: 240px">
       <div
         class="full-width row no-wrap justify-between items-center content-start">
@@ -19,7 +20,9 @@
 
 <script lang="ts">
 import { usePassportStore } from 'src/stores/passport-store';
-import { defineComponent } from 'vue';
+import { defineComponent, ref } from 'vue';
+
+const loggingIn = ref(false);
 
 export default defineComponent({
   name: 'passport-login-component',
@@ -27,6 +30,7 @@ export default defineComponent({
     const passport = usePassportStore();
 
     function login() {
+      loggingIn.value = true;
       passport.login();
     }
     function logout() {
@@ -34,6 +38,7 @@ export default defineComponent({
     }
 
     return {
+      loggingIn,
       login,
       logout,
     };

@@ -13,6 +13,7 @@ export const usePassportStore = defineStore('passport', {
     imxService: new ImmutableService(),
     provider: null as provider.IMXProvider | null,
     isAuthenticated: false,
+    ethAddress: '' as string,
     buttonState: 'Connect Passport',
     userProfile: null as UserProfile | undefined | null,
   }),
@@ -29,6 +30,7 @@ export const usePassportStore = defineStore('passport', {
             this.provider = imxProvider;
           }
           this.isAuthenticated = true;
+          this.ethAddress = await this.getAddress();
         } else {
           this.provider = null;
           this.userProfile = null;
@@ -48,8 +50,9 @@ export const usePassportStore = defineStore('passport', {
     async handleLoginCallback() {
       await this.imxService.loginCallback();
     },
-    async getAddress() {
-      if (this.isAuthenticated) this.imxService.getAccounts();
+    async getAddress(): Promise<string> {
+      if (this.isAuthenticated) return this.imxService.getAddress();
+      return '';
     },
     async getUserInfo() {
       try {

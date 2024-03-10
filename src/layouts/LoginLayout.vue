@@ -54,15 +54,30 @@
 </template>
 
 <script>
-import { computed } from 'vue';
+import { computed, watch } from 'vue';
+import { useRouter } from 'vue-router';
 import PassportLoginComponent from 'src/components/PassportLoginComponent.vue';
 import { useAssetStore } from 'src/stores/asset-store';
+import { usePassportStore } from 'src/stores/passport-store';
 
 export default {
   components: {
     PassportLoginComponent,
   },
+
   setup() {
+    const router = useRouter();
+    watch(
+      () => usePassportStore().isAuthenticated,
+      () => {
+        if (usePassportStore().isAuthenticated) {
+          const token_id = useAssetStore().metadata?.token_id;
+          token_id > 0
+            ? router.push(`/${token_id}/gameplay`)
+            : router.push('/1/gameplay');
+        }
+      }
+    );
     // const passport = usePassportStore();
     // const token_id = computed(() => useRoute().params.token_id);
     // const assetStore = useAssetStore();

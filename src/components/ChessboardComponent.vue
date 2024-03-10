@@ -15,7 +15,7 @@
             <q-btn flat :label="pieceLabels[piece]" icon-size="2em">
               <img
                 style="background-color: #ecdab9; display: inline-block"
-                :src="`/chesspieces/wikipedia/${chessboardStore.turn}${piece}.png`" />
+                :src="`/chess/chesspieces/wikipedia/${chessboardStore.turn}${piece}.png`" />
             </q-btn>
           </div>
         </q-card-section>
@@ -63,6 +63,7 @@ import {
 import { RarityBorder } from 'src/pages/features/gameplay/cm-chessboard/extensions/rarityBorder.js';
 import { useChessboardStore } from 'src/stores/chessboard-store';
 import { createInputHandler } from 'src/pages/features/gameplay/cm-chessboard/chessboardInputHandler.js';
+import { usePassportStore } from 'src/stores/passport-store';
 
 //vue imports
 import { ref, onMounted, onBeforeUnmount } from 'vue';
@@ -126,10 +127,12 @@ watch(
   () => chessboardStore.bestMove,
   () => {
     //Highlight best move
-    if (!chessboardStore.check && chessboardStore.bestMove) {
+    if (!chessboardStore.checkMate && chessboardStore.bestMove) {
       board.value.addMarker(MARKER_TYPE.bevel, chessboardStore.bestMove.to);
       board.value.addArrow(
-        ARROW_TYPE.pointy,
+        usePassportStore().isAuthenticated
+          ? ARROW_TYPE.pointy
+          : ARROW_TYPE.danger,
         chessboardStore.bestMove.from,
         chessboardStore.bestMove.to
       );
