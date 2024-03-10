@@ -19,7 +19,7 @@ async function postFen(fen: string, hintType: string): Promise<Move | null> {
       `https://chess-api.nnf.app/v1/${hintType}/${encodedFen}`
     );
 
-    console.log('Server Response:', response.data);
+    console.log(`Server ${hintType} Response:`, response.data);
     const chess = new Chess(fen);
     return chess.move(response.data);
   } catch (error) {

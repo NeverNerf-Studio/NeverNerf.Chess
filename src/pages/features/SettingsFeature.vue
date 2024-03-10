@@ -25,10 +25,16 @@
 </template>
 
 <script setup>
+import { useRouter } from 'vue-router';
 import { usePassportStore } from '/src/stores/passport-store';
-const passport = usePassportStore();
+import { useAssetStore } from 'src/stores/asset-store';
 
-function logout() {
-  passport.logout();
+const passport = usePassportStore();
+const router = useRouter();
+
+async function logout() {
+  await passport.logout();
+  const token_id = useAssetStore().metadata?.token_id;
+  token_id > 0 ? router.push(`/${token_id}`) : router.push('/1');
 }
 </script>
