@@ -130,9 +130,7 @@ watch(
     if (!chessboardStore.checkMate && chessboardStore.bestMove) {
       board.value.addMarker(MARKER_TYPE.bevel, chessboardStore.bestMove.to);
       board.value.addArrow(
-        usePassportStore().isAuthenticated
-          ? ARROW_TYPE.pointy
-          : ARROW_TYPE.danger,
+        usePassportStore().isOwner ? ARROW_TYPE.pointy : ARROW_TYPE.danger,
         chessboardStore.bestMove.from,
         chessboardStore.bestMove.to
       );

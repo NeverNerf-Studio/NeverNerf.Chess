@@ -21,20 +21,21 @@
         >Logout</q-btn
       >
     </div>
+    <div v-if="passport?.ethAddress">
+      IMX-Address: {{ passport.ethAddress }}
+    </div>
   </div>
 </template>
 
 <script setup>
 import { useRouter } from 'vue-router';
 import { usePassportStore } from '/src/stores/passport-store';
-import { useAssetStore } from 'src/stores/asset-store';
 
 const passport = usePassportStore();
 const router = useRouter();
 
 async function logout() {
   await passport.logout();
-  const token_id = useAssetStore().metadata?.token_id;
-  token_id > 0 ? router.push(`/${token_id}`) : router.push('/1');
+  router.push('/1');
 }
 </script>

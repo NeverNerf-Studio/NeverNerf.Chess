@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia';
 import { ImmutableService } from 'src/services/immutable';
-import { provider } from '@imtbl/sdk';
 
 type UserProfile = {
   email?: string;
@@ -11,8 +10,8 @@ type UserProfile = {
 export const usePassportStore = defineStore('passport', {
   state: () => ({
     imxService: new ImmutableService(),
-    provider: null as provider.IMXProvider | null,
     isAuthenticated: false,
+    isOwner: false,
     ethAddress: '' as string,
     buttonState: 'Connect Passport',
     userProfile: null as UserProfile | undefined | null,
@@ -25,16 +24,14 @@ export const usePassportStore = defineStore('passport', {
           userProfile = await this.imxService.login(); // Perform a full login
         }
         if (userProfile) {
-          const imxProvider = await this.imxService.connectImx();
-          if (imxProvider) {
-            this.provider = imxProvider;
-          }
           this.isAuthenticated = true;
           this.ethAddress = await this.getAddress();
+          this.isOwner = await this.imxService.isOwner();
         } else {
-          this.provider = null;
           this.userProfile = null;
           this.isAuthenticated = false;
+          this.isOwner = false;
+          this.ethAddress = '';
         }
       } catch (error) {
         console.error('Error Logging into Passport:', error);
@@ -43,7 +40,6 @@ export const usePassportStore = defineStore('passport', {
     },
     async logout() {
       await this.imxService.logout();
-      this.provider = null;
       this.userProfile = null;
       this.isAuthenticated = false;
     },
@@ -66,6 +62,15 @@ export const usePassportStore = defineStore('passport', {
         console.error('Error fetching user info:', error);
         return null;
       }
+    },
+    async getJWT(): Promise<string> {
+      if (!this.isAuthenticated) return '';
+
+      const jwtResponse =
+        await this.imxService.passportInstance?.getAccessToken();
+      if (jwtResponse === undefined) return '';
+
+      return jwtResponse;
     },
   },
 });

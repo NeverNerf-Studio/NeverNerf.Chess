@@ -1,13 +1,17 @@
-import { config, passport } from '@imtbl/sdk';
+import { config, x, passport } from '@imtbl/sdk';
 
 export class ImmutableService {
   passportInstance;
+  imxClientInstance;
 
   constructor() {
+    const { IMXClient, imxClientConfig } = x;
+
     try {
+      const environment = process.env.PASSPORT_env as config.Environment;
       this.passportInstance = new passport.Passport({
         baseConfig: {
-          environment: process.env.PASSPORT_env as config.Environment,
+          environment: environment,
           publishableKey: process.env.PASSPORT_publishableKey,
         },
         clientId: process.env.PASSPORT_clientId as string,
@@ -16,6 +20,7 @@ export class ImmutableService {
         audience: process.env.PASSPORT_audience,
         scope: process.env.PASSPORT_scope,
       });
+      this.imxClientInstance = new IMXClient(imxClientConfig({ environment }));
     } catch {
       console.log('Immutable Passport connection error');
     }
@@ -25,9 +30,9 @@ export class ImmutableService {
     await this.passportInstance?.loginCallback();
   }
 
-  async connectImx() {
-    return await this.passportInstance?.connectImx();
-  }
+  // async connectImx() {
+  //   return await this.passportInstance?.connectImx();
+  // }
 
   async logout() {
     await this.passportInstance?.logout();
@@ -35,6 +40,19 @@ export class ImmutableService {
 
   async getUserInfo() {
     return await this.passportInstance?.getUserInfo();
+  }
+
+  async isOwner(): Promise<boolean> {
+    const collectionAddress = process.env.NNFC_collectionId;
+    const response = await this.imxClientInstance?.listAssets({
+      collection: collectionAddress,
+      user: await this.getAddress(),
+      orderBy: 'name',
+    });
+
+    if (!response?.result) return false;
+
+    return response?.result.length > 0 ? true : false;
   }
 
   async getAddress(): Promise<string> {
