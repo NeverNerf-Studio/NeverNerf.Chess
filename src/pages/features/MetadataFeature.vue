@@ -1,5 +1,5 @@
 <template>
-  <div>{{ metadataOutput }}</div>
+  <div id="metadata">{{ metadataOutput }}</div>
 </template>
 
 <script setup lang="ts">
