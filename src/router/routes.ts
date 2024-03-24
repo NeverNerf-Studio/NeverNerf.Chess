@@ -9,6 +9,7 @@ import AssureFeature from 'pages/features/AssureFeature.vue';
 import SettingsFeature from 'pages/features/SettingsFeature.vue';
 import AnimateFeature from 'pages/features/AnimateFeature.vue';
 import ImageFeature from 'pages/features/ImageFeature.vue';
+import MetadataFeature from 'src/pages/features/MetadataFeature.vue';
 
 export default [
   {
@@ -30,18 +31,25 @@ export default [
     component: LoginLayout,
   },
   {
-    path: '/:token_id/animate',
+    path: '/:token_id/build/animate',
     name: 'Animate Board',
     icon: 'movie',
     meta: { requiresAuth: false },
     component: AnimateFeature,
   },
   {
-    path: '/:token_id/image',
+    path: '/:token_id/build/image',
     name: 'Board Image',
     icon: 'diamond',
     meta: { requiresAuth: false },
     component: ImageFeature,
+  },
+  {
+    path: '/:token_id/build/json',
+    name: 'Asset metadata transform',
+    icon: 'diamond',
+    meta: { requiresAuth: false },
+    component: MetadataFeature,
   },
   {
     path: '/:token_id',

@@ -82,6 +82,7 @@ const boardElement = ref(null);
 
 // Contains chess gamestate in pinia store
 const chessboardStore = useChessboardStore();
+chessboardStore.playable = props.playable;
 
 const pieceLabels = {
   q: 'Queen',
@@ -127,7 +128,11 @@ watch(
   () => chessboardStore.bestMove,
   () => {
     //Highlight best move
-    if (!chessboardStore.checkMate && chessboardStore.bestMove) {
+    if (
+      props.playable &&
+      !chessboardStore.checkMate &&
+      chessboardStore.bestMove
+    ) {
       board.value.addMarker(MARKER_TYPE.bevel, chessboardStore.bestMove.to);
       board.value.addArrow(
         usePassportStore().isOwner ? ARROW_TYPE.pointy : ARROW_TYPE.danger,

@@ -11,6 +11,7 @@ export const useChessboardStore = defineStore('chessboard', {
     turn: 'w',
     check: false,
     checkMate: false,
+    playable: true,
     moves: [] as string[],
     promotionMove: null as { from: string; to: string } | null,
   }),
@@ -50,7 +51,7 @@ export const useChessboardStore = defineStore('chessboard', {
       this.moves = this.chess.moves();
     },
     async getBestMove() {
-      if (!this.checkMate && !this.bestMoveLoading) {
+      if (this.playable && !this.checkMate && !this.bestMoveLoading) {
         const bestMoveFen = this.chess.fen();
         this.bestMoveLoading = true;
         const bestMoveResponse = await moveHint(bestMoveFen);
