@@ -1,19 +1,16 @@
 <template>
-  <div id="animation">
-    <ChessboardComponent :playable="false" :fen="fen" :rarity="rarity" />
-
-    <q-btn
-      color="primary"
-      id="playbutton"
-      style="display: none"
-      :label="playButtonLabel"
-      @click="animate()" />
-  </div>
+  <ChessboardComponent :playable="false" :fen="fen" :rarity="rarity" />
+  <q-btn
+    color="primary"
+    id="playbutton"
+    style="display: none"
+    :label="playButtonLabel"
+    @click="animate()" />
 </template>
 
 <script setup lang="ts">
 import { onMounted, ref, watch } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 import ChessboardComponent from 'src/components/ChessboardComponent.vue';
 import { useChessboardStore } from 'src/stores/chessboard-store';
 
@@ -23,7 +20,6 @@ const rarity = ref('');
 const chessboardStore = useChessboardStore();
 const playButtonLabel = ref('Play');
 const route = useRoute();
-const router = useRouter();
 
 // Watch the route and update refs accordingly
 watch(

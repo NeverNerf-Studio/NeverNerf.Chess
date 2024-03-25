@@ -1,5 +1,6 @@
 <template>
   <div
+    id="chessboard"
     style="width: 100%"
     :class="rarity ? `rarity ${props.rarity.toLowerCase()}` : ''"
     ref="boardElement"></div>
