@@ -12,8 +12,8 @@ const fen = computed(() => useRoute().query.fen);
 const openingName = computed(() => useRoute().query.openingName);
 const creativeName = computed(() => useRoute().query.creativeName);
 const description = computed(() => useRoute().query.description);
-const baseUrl = computed(() => useRoute().query.baseUrl);
-const assetUrl = computed(() => useRoute().query.assetUrl);
+const baseUrl = computed(() => new URL(useRoute().query.baseUrl as string));
+const assetUrl = computed(() => new URL(useRoute().query.assetUrl as string));
 const rarity = computed(() => useRoute().query.rarity);
 
 const token_id = computed(() => useRoute().params.token_id);
@@ -60,11 +60,11 @@ onMounted(() => {
     token_id: token_id.value,
     name,
     description: description.value,
-    image: `${assetUrl.value}/${token_id.value}.png`,
-    external_url: `${baseUrl.value}/#/${token_id.value}`,
-    animation_url: `${assetUrl.value}/${token_id.value}.mp4`,
+    image: new URL(`${token_id.value}.png`, assetUrl.value).toString(),
+    external_url: new URL(`#/${token_id.value}`, baseUrl.value).toString(),
+    animation_url: new URL(`${token_id.value}.mp4`, assetUrl.value).toString(),
     opening: openingName.value,
-    placeholderName: creativeName.value,
+    creativeName: creativeName.value,
     rarity: rarity.value,
     moves: moveNumber,
     fen: fenValue,
