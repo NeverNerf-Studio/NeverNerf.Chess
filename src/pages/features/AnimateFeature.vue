@@ -70,7 +70,6 @@ function animate() {
     } else {
       clearInterval(intervalId); // Stop the interval when all moves are played
       playButtonLabel.value = 'Done'; // Update the label after animation completes
-      router.push('/');
     }
   }, 200); // Adjust the timing (1000ms = 1 second) based on your needs
 }
