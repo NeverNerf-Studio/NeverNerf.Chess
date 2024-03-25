@@ -13,7 +13,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref, watch } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import ChessboardComponent from 'src/components/ChessboardComponent.vue';
 import { useChessboardStore } from 'src/stores/chessboard-store';
 
@@ -23,6 +23,7 @@ const rarity = ref('');
 const chessboardStore = useChessboardStore();
 const playButtonLabel = ref('Play');
 const route = useRoute();
+const router = useRouter();
 
 // Watch the route and update refs accordingly
 watch(
@@ -37,10 +38,6 @@ watch(
 
 function animate() {
   playButtonLabel.value = '...';
-
-  console.log(pgn.value);
-  console.log(fen.value);
-  console.log(rarity.value);
   if (pgn.value) {
     chessboardStore.updateGameFromPGN(pgn.value);
   } else {
@@ -59,7 +56,6 @@ function animate() {
     chessboardStore.updateGameFromPGN('newgame');
   }
 
-  console.log(animationMoves);
   let currentMoveIndex = 0; // Start with the first move
 
   const intervalId = setInterval(() => {
@@ -74,6 +70,7 @@ function animate() {
     } else {
       clearInterval(intervalId); // Stop the interval when all moves are played
       playButtonLabel.value = 'Done'; // Update the label after animation completes
+      router.push('/');
     }
   }, 200); // Adjust the timing (1000ms = 1 second) based on your needs
 }
