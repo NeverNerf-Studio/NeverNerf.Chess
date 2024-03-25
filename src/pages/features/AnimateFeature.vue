@@ -5,6 +5,7 @@
     <q-btn
       color="primary"
       id="playbutton"
+      style="display: none"
       :label="playButtonLabel"
       @click="animate()" />
   </div>
