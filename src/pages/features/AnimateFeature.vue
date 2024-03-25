@@ -1,34 +1,50 @@
 <template>
-  <div v-if="asset?.metadata">
-    <ChessboardComponent
-      :playable="false"
-      :fen="asset.metadata.fen"
-      :rarity="asset.metadata.rarity" />
+  <div id="animation">
+    <ChessboardComponent :playable="false" :fen="fen" :rarity="rarity" />
 
     <q-btn
       color="primary"
       id="playbutton"
       :label="playButtonLabel"
-      @click="animate" />
+      @click="animate()" />
   </div>
 </template>
 
-<script setup>
-import { onMounted, computed, ref } from 'vue';
+<script setup lang="ts">
+import { onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import ChessboardComponent from 'src/components/ChessboardComponent.vue';
 import { useChessboardStore } from 'src/stores/chessboard-store';
-import { useAssetStore } from 'src/stores/asset-store';
 
-const assetStore = useAssetStore();
-const asset = computed(() => assetStore);
-const token_id = computed(() => useRoute().params.token_id);
+const fen = ref('');
+const pgn = ref('');
+const rarity = ref('');
 const chessboardStore = useChessboardStore();
 const playButtonLabel = ref('Play');
+const route = useRoute();
 
-const animate = () => {
+// Watch the route and update refs accordingly
+watch(
+  () => route.query,
+  (query) => {
+    fen.value = (query.fen as string) || '';
+    pgn.value = (query.pgn as string) || '';
+    rarity.value = (query.rarity as string) || '';
+  },
+  { immediate: true }
+);
+
+function animate() {
   playButtonLabel.value = '...';
-  chessboardStore.updateGameFromPGN(assetStore.metadata.pgn);
+
+  console.log(pgn.value);
+  console.log(fen.value);
+  console.log(rarity.value);
+  if (pgn.value) {
+    chessboardStore.updateGameFromPGN(pgn.value);
+  } else {
+    chessboardStore.updateGameFromFen(fen.value);
+  }
   const validMoves = chessboardStore.$state.chess.moves();
   const historyMoves = chessboardStore.$state.chess.history();
 
@@ -37,7 +53,7 @@ const animate = () => {
 
   // Initialize chessboardStore conditionally
   if (historyMoves.length <= 2) {
-    chessboardStore.updateGameFromFen(assetStore.metadata.fen);
+    chessboardStore.updateGameFromFen(fen.value);
   } else {
     chessboardStore.updateGameFromPGN('newgame');
   }
@@ -47,7 +63,7 @@ const animate = () => {
 
   const intervalId = setInterval(() => {
     if (historyMoves.length <= 2) {
-      chessboardStore.updateGameFromFen(assetStore.metadata.fen);
+      chessboardStore.updateGameFromFen(fen.value);
     }
     chessboardStore.makeMove(animationMoves[currentMoveIndex]);
 
@@ -59,10 +75,9 @@ const animate = () => {
       playButtonLabel.value = 'Done'; // Update the label after animation completes
     }
   }, 200); // Adjust the timing (1000ms = 1 second) based on your needs
-};
+}
 
 onMounted(() => {
-  assetStore.loadMetadata(token_id.value);
-  chessboardStore.updateGameFromFen(assetStore.metadata.fen);
+  chessboardStore.updateGameFromFen(fen.value);
 });
 </script>

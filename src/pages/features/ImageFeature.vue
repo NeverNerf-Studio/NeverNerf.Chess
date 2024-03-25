@@ -1,17 +1,14 @@
 <template>
-  <div v-if="asset.loading">Loading...</div>
-  <div v-else class="q-pa-md">
-    <ChessboardComponent
-      :playable="false"
-      :fen="asset.metadata.fen"
-      :rarity="asset.metadata.rarity" />
+  <div id="image">
+    <ChessboardComponent :playable="false" :fen="fen" :rarity="rarity" />
   </div>
 </template>
 
 <script setup>
 import { computed } from 'vue';
-import { useAssetStore } from 'src/stores/asset-store';
+import { useRoute } from 'vue-router';
 import ChessboardComponent from 'src/components/ChessboardComponent.vue';
 
-const asset = computed(() => useAssetStore());
+const fen = computed(() => useRoute().query.fen);
+const rarity = computed(() => useRoute().query.rarity);
 </script>
