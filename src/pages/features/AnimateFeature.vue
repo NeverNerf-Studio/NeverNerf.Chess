@@ -1,5 +1,9 @@
 <template>
-  <ChessboardComponent :playable="false" :fen="fen" :rarity="rarity" />
+  <ChessboardComponent
+    :playable="false"
+    :fen="fen"
+    :pgn="pgn"
+    :rarity="rarity" />
   <q-btn
     color="primary"
     id="playbutton"
