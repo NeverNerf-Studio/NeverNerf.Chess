@@ -74,6 +74,12 @@ module.exports = configure(function (ctx) {
       // distDir
 
       extendViteConf(viteConf) {
+        // Fixes issue with the polyfill breaking @imtbl dynamic imports
+        if (!viteConf.build) viteConf.build = {};
+        if (!viteConf.build.dynamicImportVarsOptions)
+          viteConf.build.dynamicImportVarsOptions = {};
+        viteConf.build.dynamicImportVarsOptions = { exclude: 'node_modules' };
+
         // Check if optimizeDeps.esbuildOptions exists, if not, initialize it
         if (!viteConf.optimizeDeps) {
           viteConf.optimizeDeps = {};
