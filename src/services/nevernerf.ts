@@ -22,7 +22,7 @@ async function postFen(
   console.log('Requesting move for FEN:', fen);
   try {
     const response = await axios.get(
-      `https://chess-api.nnf.app/v1/${hintType}/${encodedFen}`,
+      `${process.env.NEVERNERF_GAMEPLAY_API}/${hintType}/${encodedFen}`,
       { headers: { Authorization: jwtToken } }
     );
 

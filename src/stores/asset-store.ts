@@ -73,7 +73,9 @@ export const useAssetStore = defineStore('asset', {
       }
       try {
         //Load token metadata
-        const response = await fetch(`/api/${token_id}`);
+        const metadataApiUrl = `${process.env.NEVERNERF_METADATA_API_URL}/${token_id}`;
+        console.log(metadataApiUrl);
+        const response = await fetch(metadataApiUrl);
         if (!response.ok) {
           throw new Error(`Network response was not ok for token: ${token_id}`);
         }

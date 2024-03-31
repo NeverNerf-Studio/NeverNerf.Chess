@@ -43,7 +43,7 @@ export class ImmutableService {
   }
 
   async isOwner(): Promise<boolean> {
-    const collectionAddress = process.env.NNFC_collectionId;
+    const collectionAddress = process.env.NEVERNERF_COLLECTION_ADDRESS;
     const response = await this.imxClientInstance?.listAssets({
       collection: collectionAddress,
       user: await this.getAddress(),
