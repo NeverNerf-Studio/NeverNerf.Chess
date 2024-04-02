@@ -1,15 +1,17 @@
 <template>
-  <ChessboardComponent
-    :playable="false"
-    :fen="fen"
-    :pgn="pgn"
-    :rarity="rarity" />
-  <q-btn
-    color="primary"
-    id="playbutton"
-    style="display: none"
-    :label="playButtonLabel"
-    @click="animate()" />
+  <div id="animation">
+    <ChessboardComponent
+      :playable="false"
+      :fen="fen"
+      :pgn="pgn"
+      :rarity="rarity" />
+    <q-btn
+      color="primary"
+      id="playbutton"
+      style="display: none"
+      :label="playButtonLabel"
+      @click="animate()" />
+  </div>
 </template>
 
 <script setup lang="ts">
