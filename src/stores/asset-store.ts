@@ -27,7 +27,7 @@ export const useAssetStore = defineStore('asset', {
     async loadCollection() {
       this.loading = true;
       if (this.tokens) return; // Don't load collection if already loaded
-      const indexFile = `${process.env.NEVERNERF_METADATA_API_URL}/index.json`;
+      const indexFile = `${process.env.NEVERNERF_METADATA_API_URL}index.json`;
       try {
         const collectionConfigResponse = await fetch(indexFile);
         if (!collectionConfigResponse.ok) {
